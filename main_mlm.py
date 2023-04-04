@@ -1,4 +1,4 @@
-import secret_stuff as bot_info
+from secret_stuff import bot_token
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -10,14 +10,12 @@ logging.basicConfig(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    text = f"Ciao {user.full_name}. Come straminchia stai?"
+    text = f"Ciao _{user.full_name}_\. Come va?"
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
 if __name__ == '__main__':
-    application = ApplicationBuilder()
-    application.token(bot_info.mov_list_token)
-    application.build()
+    application = ApplicationBuilder().token(bot_token).build()
     
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
