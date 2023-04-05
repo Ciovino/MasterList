@@ -8,9 +8,15 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+known_users = []
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    text = f"Ciao _{user.full_name}_\. Come va?"
+    if user.id not in known_users:
+        known_users.append(user.id)
+        text = f"Ciao _{user.full_name}_\."
+    else: 
+        text = f"Bentornato _{user.full_name}_\."
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
