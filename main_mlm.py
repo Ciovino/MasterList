@@ -1,4 +1,5 @@
 from secret_stuff import bot_token
+from user_info import UserInfo, KnownUserManager
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -8,15 +9,17 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-known_users = []
-
+known_users = KnownUserManager('known_users.json')
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    if user.id not in known_users:
-        known_users.append(user.id)
-        text = f"Ciao _{user.full_name}_\."
+    user = UserInfo(update.effective_user.id, update.effective_user.full_name)
+
+    if not known_users.is_known_user(user):
+        known_users.add_user(user)
+        known_users.save_users()
+        
+        text = f"Ciao _{user.name}_\."
     else: 
-        text = f"Bentornato _{user.full_name}_\."
+        text = f"Bentornato _{user.name}_\."
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
