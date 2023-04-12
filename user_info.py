@@ -2,12 +2,28 @@ import json
 from secret_stuff import private_folder
 
 class KnownUserManager:
-    def __init__(self, known_user_file) -> None:
+    def __init__(self, known_user_file:str) -> None:
         self.file_name = private_folder + known_user_file
-        self.local_list = []
+        self.local_list = KnownUserManager.load_user(self.file_name)
+
+    # New User
+    def add_user(self, new_user) -> None:
+        self.local_list.append(new_user)
+        self.save_users()
+    
+    # Check if alredy know the user
+    def is_known_user(self, user) -> bool:
+        for saved_user in self.local_list:
+            if saved_user.same_user(user):
+                return True
+        
+        return False
+
+    def load_user(file_name) -> list:
+        local_list = []
 
         # Json file with all the known users
-        users_in_file = open(self.file_name, 'r').readlines()
+        users_in_file = open(file_name, 'r').readlines()
 
         entrire_file = ""
         for line in users_in_file:
@@ -16,22 +32,12 @@ class KnownUserManager:
         if entrire_file != "":
             all_user = json.loads(entrire_file)
             for user in all_user:
-                self.local_list.append(UserInfo(user['id'], user['name']))
+                local_list.append(UserInfo(user['id'], user['name']))
 
-    # New User
-    def add_user(self, new_user):
-        self.local_list.append(new_user)
-    
-    # Check if alredy know the user
-    def is_known_user(self, user):
-        for saved_user in self.local_list:
-            if saved_user.same_user(user):
-                return True
-        
-        return False
-    
+        return local_list
+
     # Save all knwon user in the json file
-    def save_users(self):
+    def save_users(self) -> None:
         users_in_file = open(self.file_name, 'w')
 
         json_users = []
@@ -43,7 +49,7 @@ class KnownUserManager:
         users_in_file.close()
 
 class UserInfo:
-    def __init__(self, id, name) -> None:
+    def __init__(self, id:int, name:str) -> None:
         self.id = id
         self.name = name
 
@@ -52,7 +58,7 @@ class UserInfo:
         return self.id == other.id
 
     # Create a dictionary
-    def user_to_table(self):
+    def user_to_table(self) -> dict:
         return { 
             'id': self.id, 
             'name': self.name
