@@ -15,7 +15,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not known_users.is_known_user(user):
         known_users.add_user(user)
-        known_users.save_users()
         
         text = f"Ciao _{user.name}_\."
     else: 
@@ -23,10 +22,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
+async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text="Piacere dei conoscerti", 
+        parse_mode='MarkdownV2'
+    )
+
 if __name__ == '__main__':
     application = ApplicationBuilder().token(bot_token).build()
     
     start_handler = CommandHandler('start', start)
+    about_handler = CommandHandler('about', about)
+
     application.add_handler(start_handler)
+    application.add_handler(about_handler)
 
     application.run_polling()
