@@ -12,12 +12,12 @@ class KnownUserManager:
         self.save_users()
     
     # Check if alredy know the user
-    def is_known_user(self, user) -> bool:
+    def is_known_user(self, user):
         for saved_user in self.local_list:
             if saved_user.same_user(user):
-                return True
+                return saved_user
         
-        return False
+        return None
 
     def load_user(file_name) -> list:
         local_list = []
@@ -55,7 +55,10 @@ class UserInfo:
 
     # Check if self and other are the same user
     def same_user(self, other) -> bool:
-        return self.id == other.id
+        if type(other) is int:
+            return self.id == other
+        else:
+            return self.id == other.id
 
     # Create a dictionary
     def user_to_table(self) -> dict:

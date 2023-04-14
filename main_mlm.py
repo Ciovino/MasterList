@@ -11,9 +11,9 @@ logging.basicConfig(
 
 known_users = KnownUserManager('known_users.json')
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = UserInfo(update.effective_user.id, update.effective_user.full_name)
+    user = known_users.is_known_user(update.effective_user.id)
 
-    if not known_users.is_known_user(user):
+    if user is None:
         known_users.add_user(user)
         
         text = f"Ciao _{user.name}_\."
@@ -21,6 +21,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = f"Bentornato _{user.name}_\."
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
+
+async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
 
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_ e ti aiuterò a gestire film e serie TV che hai intenzione di guardare\."
@@ -59,10 +62,12 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(bot_token).build()
     
     start_handler = CommandHandler('start', start)
+    file_handler = CommandHandler('file', file_cmd)
     about_handler = CommandHandler('about', about)
     command_list_handler = CallbackQueryHandler(command_list)
 
     application.add_handler(start_handler)
+    application.add_handler(file_handler)
     application.add_handler(about_handler)
     application.add_handler(command_list_handler)
 
