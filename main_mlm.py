@@ -14,7 +14,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = known_users.is_known_user(update.effective_user.id)
 
     if user is None:
-        known_users.add_user(user)
+        user = known_users.add_user(UserInfo(update.effective_user.id, update.effective_user.full_name, "start", []))
         
         text = f"Ciao _{user.name}_\."
     else:
@@ -48,10 +48,18 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.state != "file":
         return
     
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, 
-        text=f"Nuovo file creato (non è vero): {(update.message.text).replace(' ', '_').lower()}.json"
-    )
+    if user.add_file(update.message.text):
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=f"Nuovo file creato: {(update.message.text).replace(' ', '_').lower()}.json"
+        )
+
+        known_users.save_users()
+    else:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=f"Sorry. Non posso creare il file"
+        )
 
     user.state = "start"
 
