@@ -32,7 +32,7 @@ class KnownUserManager:
         if entrire_file != "":
             all_user = json.loads(entrire_file)
             for user in all_user:
-                local_list.append(UserInfo(user['id'], user['name']))
+                local_list.append(UserInfo(user['id'], user['name'], "start"))
 
         return local_list
 
@@ -49,9 +49,10 @@ class KnownUserManager:
         users_in_file.close()
 
 class UserInfo:
-    def __init__(self, id:int, name:str) -> None:
+    def __init__(self, id:int, name:str, state) -> None:
         self.id = id
         self.name = name
+        self.state = state
 
     # Check if self and other are the same user
     def same_user(self, other) -> bool:

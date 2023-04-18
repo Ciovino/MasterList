@@ -2,7 +2,7 @@ from secret_stuff import bot_token, github_repo_url
 from user_info import UserInfo, KnownUserManager
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram.ext import filters, ApplicationBuilder, MessageHandler, CommandHandler, CallbackQueryHandler, ContextTypes
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -17,13 +17,53 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         known_users.add_user(user)
         
         text = f"Ciao _{user.name}_\."
-    else: 
+    else:
+        if user.state != "start":
+            return
+    
         text = f"Bentornato _{user.name}_\."
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
 async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
+    user = known_users.is_known_user(update.effective_user.id)
+    if user.state == "start":
+        # Primo messaggio
+        user.state = "file"
+
+        inline_keyboard = [
+            [InlineKeyboardButton("Nuovo file", callback_data='new_file')],
+            # [InlineKeyboardButton("Salva robe", callback_data='save_things')],
+            # [InlineKeyboardButton("Scancellamento", callback_data='delete_file')]
+        ]
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text="Cosa vuoi fare?",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard)
+        )
+
+async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = known_users.is_known_user(update.effective_user.id)
+    if user.state != "file":
+        return
+    
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=f"Nuovo file creato (non è vero): {(update.message.text).replace(' ', '_').lower()}.json"
+    )
+
+    user.state = "start"
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = known_users.is_known_user(update.effective_user.id)
+
+    user.state = "start"
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text="Operazione annullata\nRIPETO\nOPERAZIONE ANNULLATA"
+    )
 
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_ e ti aiuterò a gestire film e serie TV che hai intenzione di guardare\."
@@ -46,7 +86,7 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     await query.delete_message()
 
-    if query.data == "comandi_spiegazione":        
+    if query.data == "comandi_spiegazione":
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
 
         await context.bot.send_message(
@@ -56,18 +96,32 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     elif query.data == "nuove_features":
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Al momento non c'è nulla in programma")
+    elif query.data == "new_file":
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi il nome del file")
 
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(bot_token).build()
     
+    # Start
     start_handler = CommandHandler('start', start)
+    
+    # File
     file_handler = CommandHandler('file', file_cmd)
+
+    # About
     about_handler = CommandHandler('about', about)
     command_list_handler = CallbackQueryHandler(command_list)
 
+    # Cancel
+    cancel_handler = CommandHandler('back', cancel)
+
+    new_file_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), new_file)
+
+    application.add_handler(new_file_handler)
     application.add_handler(start_handler)
     application.add_handler(file_handler)
+    application.add_handler(cancel_handler)
     application.add_handler(about_handler)
     application.add_handler(command_list_handler)
 
