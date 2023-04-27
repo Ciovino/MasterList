@@ -2,6 +2,8 @@ import json
 from secret_stuff import private_folder
 from user_info import UserInfo
 
+# Si occupa di riconoscere e salvare nuovi utenti
+
 class KnownUserManager:
     def __init__(self, known_user_file:str) -> None:
         self.file_name = private_folder + known_user_file

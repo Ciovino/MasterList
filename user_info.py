@@ -1,5 +1,8 @@
 import json, os
 from secret_stuff import private_folder
+from user_file_manager import UserFileManager
+
+# Racchiude tutte le informazioni di un utente
 
 class UserInfo:
     def __init__(self, id:int, name:str, state, files:list) -> None:
@@ -7,6 +10,8 @@ class UserInfo:
         self.name = name
         self.state = state
         self.files = files
+
+        self.file_manager = UserFileManager(id, files)
 
     # Check if self and other are the same user
     def same_user(self, other) -> bool:
