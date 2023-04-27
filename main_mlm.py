@@ -1,5 +1,6 @@
 from secret_stuff import bot_token, github_repo_url
-from user_info import UserInfo, KnownUserManager
+from user_info import UserInfo
+from known_user_manager import KnownUserManager
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import filters, ApplicationBuilder, MessageHandler, CommandHandler, CallbackQueryHandler, ContextTypes
