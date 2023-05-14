@@ -34,6 +34,7 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         inline_keyboard = [
             [InlineKeyboardButton("Nuovo file", callback_data='new_file')],
+            [InlineKeyboardButton("Cambia file attivo", callback_data='change_active')]
             # [InlineKeyboardButton("Salva robe", callback_data='save_things')],
             # [InlineKeyboardButton("Scancellamento", callback_data='delete_file')]
         ]
@@ -46,23 +47,23 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = known_users.is_known_user(update.effective_user.id)
-    if user.state != "file":
+    if user.state == "new_file":    
+        if user.add_file(update.message.text):
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, 
+                text=f"Nuovo file creato: {(update.message.text).replace(' ', '_').lower()}.json"
+            )
+
+            known_users.save_users()
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, 
+                text=f"Sorry. Non posso creare il file"
+            )
+
+        user.state = "start"
+    elif user.state == "change_active":
         return
-    
-    if user.add_file(update.message.text):
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, 
-            text=f"Nuovo file creato: {(update.message.text).replace(' ', '_').lower()}.json"
-        )
-
-        known_users.save_users()
-    else:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, 
-            text=f"Sorry. Non posso creare il file"
-        )
-
-    user.state = "start"
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = known_users.is_known_user(update.effective_user.id)
@@ -90,6 +91,7 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = known_users.is_known_user(update.effective_user.id)
     query = update.callback_query
 
     await query.answer()
@@ -106,8 +108,36 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "nuove_features":
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Al momento non c'è nulla in programma")
     elif query.data == "new_file":
+        user.state = 'new_file'
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi il nome del file")
+    elif query.data == "change_active":
+        user.state = 'change_active'
+        
+        active_file = user.get_active_file()
+        text = ''
+        if active_file != None:
+            text = f'File attivo: {active_file}.\nQuale file vuoi attivare?'
+        else:
+            text = f'Nessun file attivo.\nQuale file vuoi attivare?'
 
+        all_file = user.get_files()
+        inline_keyboard = []
+
+        for file in all_file:
+            inline_keyboard.append([InlineKeyboardButton(file, callback_data=file)])
+        
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=text, 
+            reply_markup=InlineKeyboardMarkup(inline_keyboard)
+        )
+    else:
+        if user.change_active(query.data):
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="File attivato")
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile attivare il file")
+        
+        user.state = 'start'
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(bot_token).build()

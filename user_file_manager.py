@@ -14,21 +14,28 @@ class UserFileManager:
         if not os.path.exists(self.get_user_folder()):
             os.mkdir(self.get_user_folder())
         
-        # Controlla che non esista nessun file con lo stesso nome
-        #if self.is_file(new_file_name):            
-        #   return False # Impossibile creare il file
-        
         # Crea il file
         try:
             open(self.get_complete_file_name(new_file_name), 'x').close()
-        except FileExistsError:
+        except FileExistsError: # Il file non esiste
             return False
 
         self.files.append(new_file_name)
+        self.active_file = new_file_name # Imposta come attivo il file appena creato
         return True
 
     def save(self, info:str):
         pass
+
+    def get_active_file(self):
+        return self.active_file
+
+    def change_active(self, new_active_file: str):
+        if new_active_file in self.files:
+            self.active_file = new_active_file
+            return True
+        else:
+            return False
 
     def get_files(self) -> list[str]:
         return self.files

@@ -20,6 +20,15 @@ class UserInfo:
 
     def add_file(self, user_file_name:str):
         return self.file_manager.add_file(user_file_name)
+    
+    def get_active_file(self):
+        return self.file_manager.get_active_file()
+    
+    def change_active(self, new_active_file: str):
+        return self.file_manager.change_active(new_active_file)
+
+    def get_files(self):
+        return self.file_manager.get_files()
 
     # Create a dictionary
     def user_to_table(self) -> dict:
