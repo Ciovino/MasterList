@@ -32,10 +32,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
+async def unknown_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Ciao _{update.effective_user.full_name}_\.Per cominciare ad usare il bot, usa il comando /start', parse_mode='MarkdownV2')
+
 # Comando /file
 async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Controlla lo stato dell'utente
     if user.state == "start":
@@ -59,6 +66,10 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Controlla lo stato dell'utente
     if user.state == "new_file":
@@ -93,6 +104,10 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
 
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     # Reimposta lo stato
     user.state = "save"
 
@@ -105,6 +120,10 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Reimposta lo stato
     user.state = "delete"
@@ -125,6 +144,10 @@ async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Reimposta lo stato
     user.state = "start"
@@ -153,6 +176,11 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Rispondi alle CallBackQuery
 async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     query = update.callback_query
 
     await query.answer()

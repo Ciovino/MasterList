@@ -6,7 +6,7 @@ Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando se
 Una presentazione migliorata, leggermente più tecnica, e poi qualche bug in meno (si spera)
 #### Novità
 - _Nuova presentazione_: Presentazione fatta meglio.
-#### Bug Noti
+#### Bug Risolti
 - _Riconoscimento utente_: Issue #5: Miglioramento dei controlli dell'utente che manda i messaggi.
 #### Comandi
 - */start*: Manda un saluto all'utente;
