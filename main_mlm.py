@@ -10,7 +10,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-known_users = KnownUserManager('known_users.json')
+known_users = KnownUserManager('bot\\known_users.json')
 
 # Comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -234,11 +234,9 @@ async def mex_command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def mex_bot_version(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.2\.1_: Presentazioni e Bug", parse_mode='MarkdownV2')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.3_: Pronto per le traduzioni", parse_mode='MarkdownV2')
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Nuova Presentazione_: Presentazione fatta meglio\.", parse_mode='MarkdownV2')
-
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Bug Risolti:\n\- _Riconoscimento utente_: Issue \#5: Miglioramento dei controlli dell'utente che manda i messaggi\.", parse_mode="MarkdownV2")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Mex\_Manager_: Gestione messaggi tramite tabelle e file json\.", parse_mode='MarkdownV2')
 
 async def change_active_file(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     user.state = 'change_active'
