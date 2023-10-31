@@ -29,12 +29,12 @@ class KnownUserManager:
         # Json file with all the known users
         users_in_file = open(file_name, 'r').readlines()
 
-        entrire_file = ""
+        entire_file = ""
         for line in users_in_file:
-            entrire_file = entrire_file + (line.replace("\n", '').replace('  ', ''))
+            entire_file = entire_file + (line.replace("\n", '').replace('  ', ''))
 
-        if entrire_file != "":
-            all_user = json.loads(entrire_file)
+        if entire_file != "":
+            all_user = json.loads(entire_file)
             for user in all_user:
                 local_list.append(UserInfo(user['id'], user['name'], "start", user['files']))
 

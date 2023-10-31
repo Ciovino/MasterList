@@ -1,5 +1,5 @@
 from secret_stuff import private_folder
-import os
+import os, json
 
 # Gestisce la scrittura/lettura/salvataggio dei file privati dell'utente
 
@@ -7,6 +7,7 @@ class UserFileManager:
     def __init__(self, id:int, user_file:list[str]):
         self.user_id = id
         self.active_file = None
+        self.loaded_file = []
         self.files = user_file
     
     def add_file(self, new_file_name:str) -> bool:
@@ -25,17 +26,52 @@ class UserFileManager:
         return True
 
     def save(self, info:str):
-        pass
+        self.loaded_file.append(info)
+        self.save_on_file(self.active_file)
 
     def get_active_file(self):
         return self.active_file
 
     def change_active(self, new_active_file: str):
         if new_active_file in self.files:
+            self.save_on_file(self.active_file)
+
             self.active_file = new_active_file
+            self.loaded_file = []
+
+            self.load_file(new_active_file)
+
             return True
         else:
             return False
+
+    def save_on_file(self, to_file:str):
+        if to_file == None:
+            return
+
+        open_file = open(self.get_complete_file_name(to_file), 'w')
+
+        json_strings = []
+
+        for phrase in self.loaded_file:
+            tmp = {'value': phrase}
+            json_strings.append(tmp)
+        
+        open_file.write(json.dumps(json_strings, indent=2))
+        
+        open_file.close()
+
+    def load_file(self, from_file: str):
+        all_lines = open(self.get_complete_file_name(from_file), 'r').readlines()
+
+        entire_file = ""
+        for line in all_lines:
+            entire_file = entire_file + (line.replace("\n", '').replace('  ', ''))
+
+        if entire_file != "":
+            phrases = json.loads(entire_file)
+            for phrase in phrases:
+                self.loaded_file.append(phrase['value'])
 
     def get_files(self) -> list[str]:
         return self.files
