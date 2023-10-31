@@ -33,6 +33,9 @@ class UserInfo:
     def save(self, phrase: str):
         self.file_manager.save(phrase)
 
+    def delete_file(self, file_to_delete:str):
+        return self.file_manager.delete(file_to_delete)
+
     # Recupera i nomi dei file
     def get_files(self):
         return self.file_manager.get_files()

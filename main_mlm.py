@@ -45,8 +45,8 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         inline_keyboard = [
             [InlineKeyboardButton("Nuovo file", callback_data='new_file')],
             [InlineKeyboardButton("Cambia file attivo", callback_data='change_active')],
-            [InlineKeyboardButton("Salva robe", callback_data='save_file')]
-            # [InlineKeyboardButton("Scancellamento", callback_data='delete_file')]
+            [InlineKeyboardButton("Salva robe", callback_data='save_file')],
+            [InlineKeyboardButton("Scancellamento", callback_data='delete_file')]
         ]
 
         await context.bot.send_message(
@@ -101,6 +101,25 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi quello che vuoi salvare")
+
+async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Recupera le info dell'utente
+    user = known_users.is_known_user(update.effective_user.id)
+
+    # Reimposta lo stato
+    user.state = "delete"
+
+    all_file = user.get_files()
+    inline_keyboard = []
+
+    for file in all_file:
+        inline_keyboard.append([InlineKeyboardButton(file, callback_data=file)])
+    
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text="Quale file vuoi cancellare?", 
+        reply_markup=InlineKeyboardMarkup(inline_keyboard)
+    )
 
 # Comando /cancel
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -162,11 +181,24 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == "save_file":
         # Salva su file attivo
         await save_on_file(update, context)
+    elif query.data == "delete_file":
+        # Cancella un file
+        await delete_file(update, context)
     else:
-        if user.change_active(query.data):
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="File attivato")
-        else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile attivare il file")
+        # Cambia file attivo
+        if user.state == "change_active":
+            if user.change_active(query.data):
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="File attivato")
+            else:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile attivare il file")
+        # Cancella un file
+        elif user.state == "delete":
+            if user.delete_file(query.data):
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="File eliminato")
+            else:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile eliminare il file")
+            
+            known_users.save_users()
         
         user.state = 'start'
 
@@ -205,6 +237,9 @@ if __name__ == '__main__':
     # Comando /save
     save_handler = CommandHandler('save', save_on_file)
 
+    # Comando /delete
+    delete_handler = CommandHandler('delete', delete_file)
+
     # Comando /about
     about_handler = CommandHandler('about', about)
     command_list_handler = CallbackQueryHandler(command_list)
@@ -219,6 +254,7 @@ if __name__ == '__main__':
     application.add_handler(start_handler)
     application.add_handler(file_handler)
     application.add_handler(save_handler)
+    application.add_handler(delete_handler)
     application.add_handler(cancel_handler)
     application.add_handler(about_handler)
     application.add_handler(command_list_handler)

@@ -29,6 +29,23 @@ class UserFileManager:
         self.loaded_file.append(info)
         self.save_on_file(self.active_file)
 
+    def delete(self, file_to_delete:str):
+        if not self.is_file(file_to_delete):
+            return False
+        
+        if file_to_delete == self.active_file:
+            self.active_file = None
+            self.loaded_file = []
+
+        if os.path.exists(self.get_complete_file_name(file_to_delete)):
+            os.remove(self.get_complete_file_name(file_to_delete))
+        else:
+            return False
+        
+        self.files.remove(file_to_delete)
+
+        return True
+
     def get_active_file(self):
         return self.active_file
 
