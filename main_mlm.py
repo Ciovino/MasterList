@@ -32,10 +32,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
 
+async def unknown_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Ciao _{update.effective_user.full_name}_\.Per cominciare ad usare il bot, usa il comando /start', parse_mode='MarkdownV2')
+
 # Comando /file
 async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Controlla lo stato dell'utente
     if user.state == "start":
@@ -59,6 +66,10 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Controlla lo stato dell'utente
     if user.state == "new_file":
@@ -93,6 +104,10 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
 
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     # Reimposta lo stato
     user.state = "save"
 
@@ -105,6 +120,10 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
 
     # Reimposta lo stato
     user.state = "delete"
@@ -126,6 +145,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
     user = known_users.is_known_user(update.effective_user.id)
 
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     # Reimposta lo stato
     user.state = "start"
 
@@ -136,10 +159,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Comando /about
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_ e ti aiuterò a gestire film e serie TV che hai intenzione di guardare\."
+    about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_, il miglior gestore di liste che tu possa mai desiderare\."
     inline_keyboard = [
         [InlineKeyboardButton("Lista completa dei comandi", callback_data='comandi_spiegazione')],
-        [InlineKeyboardButton("Lista delle features in arrivo", callback_data='nuove_features')],
+        [InlineKeyboardButton("Versione del bot", callback_data='versione')],
         [InlineKeyboardButton("Repository GitHub", url=github_repo_url)]
     ]
 
@@ -153,6 +176,11 @@ async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # Rispondi alle CallBackQuery
 async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = known_users.is_known_user(update.effective_user.id)
+
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     query = update.callback_query
 
     await query.answer()
@@ -161,16 +189,10 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Controlla la query
     if query.data == "comandi_spiegazione":
         # Messaggio con la spiegazione dei comandi
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
-
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="_/start_: Manda un saluto all'utente;\n_/about_: Presentazione\.",
-            parse_mode='MarkdownV2'
-        )
-    elif query.data == "nuove_features":
-        # Messaggio con tutte le nuove features in programma
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Al momento non c'è nulla in programma")
+        await mex_command_list(update, context)
+    elif query.data == "versione":
+        # Messaggio con le informazioni riguardanti la versione attuale del bot
+        await mex_bot_version(update, context)
     elif query.data == "new_file":
         # Crea un nuovo file
         user.state = 'new_file'
@@ -201,6 +223,22 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
             known_users.save_users()
         
         user.state = 'start'
+
+async def mex_command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="_/start_: Manda un saluto all'utente;\n_/file_: Tutto ciò che serve per salvare le robe utili;\n_/save_: Salva sul file attivo;\n_/delete_: Cancella un file esistente;\n_/about_: Presentazione;\n_/back_: Annulla l'ultima operazione\.",
+        parse_mode='MarkdownV2'
+    )
+
+async def mex_bot_version(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.2\.1_: Presentazioni e Bug", parse_mode='MarkdownV2')
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Nuova Presentazione_: Presentazione fatta meglio\.", parse_mode='MarkdownV2')
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Bug Risolti:\n\- _Riconoscimento utente_: Issue \#5: Miglioramento dei controlli dell'utente che manda i messaggi\.", parse_mode="MarkdownV2")
 
 async def change_active_file(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     user.state = 'change_active'

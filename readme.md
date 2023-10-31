@@ -2,6 +2,20 @@
 Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando sei indeciso.
 
 ## Changelog
+### Versione 0.2.1 (Presentazioni e Bug)
+Una presentazione migliorata, leggermente più tecnica, e poi qualche bug in meno (si spera)
+#### Novità
+- _Nuova presentazione_: Presentazione fatta meglio.
+#### Bug Risolti
+- _Riconoscimento utente_: Issue #5: Miglioramento dei controlli dell'utente che manda i messaggi.
+#### Comandi
+- */start*: Manda un saluto all'utente;
+- */file*: Tutto ciò che serve per salvare le robe utili;
+- */save*: Salva sul file attivo;
+- */delete*: Cancella un file esistente;
+- */about*: Presentazione;
+- */back*: Annulla l'ultima operazione.
+
 ### Versione 0.2 (File-inator)
 Cominciamo a salvare roba
 #### Novità
@@ -9,12 +23,12 @@ Cominciamo a salvare roba
 	- _Nuovo File_: crea un nuovo file in cui salvare robe (per ora solo frasi);
 	- _Salva Roba_: salva in un file;
 	- _Scancellamento_: cancella file.
-- _Comando /cancel_: Annulla l'ultima operazione
+- _Comando /back_: Annulla l'ultima operazione
 #### Comandi
 - */start*: Manda un saluto all'utente;
 - */file*: Tutto ciò che serve per salvare le robe utili;
 - */about*: Presentazione;
-- */cancel*: Annulla l'ultima operazione.
+- */back*: Annulla l'ultima operazione.
 
 ### Versione 0.1 (Approcci)
 Ora si presenta per bene e si ricorderà di te.
