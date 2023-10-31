@@ -159,10 +159,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Comando /about
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_ e ti aiuterò a gestire film e serie TV che hai intenzione di guardare\."
+    about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_, il miglior gestore di liste che tu possa mai desiderare\."
     inline_keyboard = [
         [InlineKeyboardButton("Lista completa dei comandi", callback_data='comandi_spiegazione')],
-        [InlineKeyboardButton("Lista delle features in arrivo", callback_data='nuove_features')],
+        [InlineKeyboardButton("Versione del bot", callback_data='versione')],
         [InlineKeyboardButton("Repository GitHub", url=github_repo_url)]
     ]
 
@@ -193,12 +193,16 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="_/start_: Manda un saluto all'utente;\n_/about_: Presentazione\.",
+            text="_/start_: Manda un saluto all'utente;\n_/file_: Tutto ciò che serve per salvare le robe utili;\n_/save_: Salva sul file attivo;\n_/delete_: Cancella un file esistente;\n_/about_: Presentazione;\n_/back_: Annulla l'ultima operazione\.",
             parse_mode='MarkdownV2'
         )
-    elif query.data == "nuove_features":
-        # Messaggio con tutte le nuove features in programma
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Al momento non c'è nulla in programma")
+    elif query.data == "versione":
+        # Messaggio con le informazioni riguardanti la versione attuale del bot
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.2\.1_: Presentazioni e Bug", parse_mode='MarkdownV2')
+
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Nuova Presentazione_: Presentazione fatta meglio\.", parse_mode='MarkdownV2')
+
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Bug Risolti:\n\- _Riconoscimento utente_: Issue \#5: Miglioramento dei controlli dell'utente che manda i messaggi\.", parse_mode="MarkdownV2")
     elif query.data == "new_file":
         # Crea un nuovo file
         user.state = 'new_file'

@@ -14,7 +14,7 @@ Una presentazione migliorata, leggermente più tecnica, e poi qualche bug in men
 - */save*: Salva sul file attivo;
 - */delete*: Cancella un file esistente;
 - */about*: Presentazione;
-- */cancel*: Annulla l'ultima operazione.
+- */back*: Annulla l'ultima operazione.
 
 ### Versione 0.2 (File-inator)
 Cominciamo a salvare roba
@@ -23,12 +23,12 @@ Cominciamo a salvare roba
 	- _Nuovo File_: crea un nuovo file in cui salvare robe (per ora solo frasi);
 	- _Salva Roba_: salva in un file;
 	- _Scancellamento_: cancella file.
-- _Comando /cancel_: Annulla l'ultima operazione
+- _Comando /back_: Annulla l'ultima operazione
 #### Comandi
 - */start*: Manda un saluto all'utente;
 - */file*: Tutto ciò che serve per salvare le robe utili;
 - */about*: Presentazione;
-- */cancel*: Annulla l'ultima operazione.
+- */back*: Annulla l'ultima operazione.
 
 ### Versione 0.1 (Approcci)
 Ora si presenta per bene e si ricorderà di te.
