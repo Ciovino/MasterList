@@ -189,20 +189,10 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Controlla la query
     if query.data == "comandi_spiegazione":
         # Messaggio con la spiegazione dei comandi
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
-
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="_/start_: Manda un saluto all'utente;\n_/file_: Tutto ciò che serve per salvare le robe utili;\n_/save_: Salva sul file attivo;\n_/delete_: Cancella un file esistente;\n_/about_: Presentazione;\n_/back_: Annulla l'ultima operazione\.",
-            parse_mode='MarkdownV2'
-        )
+        await mex_command_list(update, context)
     elif query.data == "versione":
         # Messaggio con le informazioni riguardanti la versione attuale del bot
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.2\.1_: Presentazioni e Bug", parse_mode='MarkdownV2')
-
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Nuova Presentazione_: Presentazione fatta meglio\.", parse_mode='MarkdownV2')
-
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Bug Risolti:\n\- _Riconoscimento utente_: Issue \#5: Miglioramento dei controlli dell'utente che manda i messaggi\.", parse_mode="MarkdownV2")
+        await mex_bot_version(update, context)
     elif query.data == "new_file":
         # Crea un nuovo file
         user.state = 'new_file'
@@ -233,6 +223,22 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
             known_users.save_users()
         
         user.state = 'start'
+
+async def mex_command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="_/start_: Manda un saluto all'utente;\n_/file_: Tutto ciò che serve per salvare le robe utili;\n_/save_: Salva sul file attivo;\n_/delete_: Cancella un file esistente;\n_/about_: Presentazione;\n_/back_: Annulla l'ultima operazione\.",
+        parse_mode='MarkdownV2'
+    )
+
+async def mex_bot_version(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.2\.1_: Presentazioni e Bug", parse_mode='MarkdownV2')
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Nuova Presentazione_: Presentazione fatta meglio\.", parse_mode='MarkdownV2')
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Bug Risolti:\n\- _Riconoscimento utente_: Issue \#5: Miglioramento dei controlli dell'utente che manda i messaggi\.", parse_mode="MarkdownV2")
 
 async def change_active_file(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     user.state = 'change_active'
