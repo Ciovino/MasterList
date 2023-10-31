@@ -14,7 +14,6 @@ Nuova gestione dei messaggi del bot, così da poter eventualmente insegnarli nuo
 - */about*: Presentazione;
 - */back*: Annulla l'ultima operazione.
 
-
 ### Versione 0.2.1 (Presentazioni e Bug)
 Una presentazione migliorata, leggermente più tecnica, e poi qualche bug in meno (si spera)
 #### Novità

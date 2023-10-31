@@ -1,6 +1,7 @@
 from secret_stuff import bot_token, github_repo_url
 from user_info import UserInfo
 from known_user_manager import KnownUserManager
+from mex_manager import MexManager
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import filters, ApplicationBuilder, MessageHandler, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -11,6 +12,7 @@ logging.basicConfig(
 )
 
 known_users = KnownUserManager('bot\\known_users.json')
+mex_manager = MexManager('bot\\bot_mex.json')
 
 # Comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -260,6 +262,10 @@ async def change_active_file(user:UserInfo, update: Update, context: ContextType
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
 
+async def test_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex('saluta_2'))
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex('saluta'))
+
 if __name__ == '__main__':
     # Crea il bot
     application = ApplicationBuilder().token(bot_token).build()
@@ -283,6 +289,9 @@ if __name__ == '__main__':
     # Comando /cancel
     cancel_handler = CommandHandler('back', cancel)
 
+    # Comando /test
+    test_handler = CommandHandler('test', test_cmd)
+
     # Prendi il nome del nuovo file da creare
     new_file_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), new_file)
 
@@ -294,5 +303,7 @@ if __name__ == '__main__':
     application.add_handler(cancel_handler)
     application.add_handler(about_handler)
     application.add_handler(command_list_handler)
+
+    application.add_handler(test_handler)
 
     application.run_polling()
