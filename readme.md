@@ -6,6 +6,8 @@ Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando se
 Nuova gestione dei messaggi del bot, così da poter eventualmente insegnarli nuove lingue
 #### Novità
 - _Mex\_Manager_: Gestione messaggi tramite tabelle e file json.
+#### Bug Risolti
+- _Creazione di un nuovo file_: Issue #7: Durante la creazione di un nuovo file, veniva erroneamente salvato il contenuto dell'ultimo file attivo nel file appena creato.
 #### Comandi
 - */start*: Manda un saluto all'utente;
 - */file*: Tutto ciò che serve per salvare le robe utili;
