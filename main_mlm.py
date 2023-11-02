@@ -23,19 +23,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Aggiungi l'utente se è nuovo
         user = known_users.add_user(UserInfo(update.effective_user.id, update.effective_user.full_name, "start", []))
         
-        text = f"Ciao _{user.name}_\."
+        text = mex_manager.return_mex("primo_saluto", user, update.message)
     else:
         # Controlla lo stato dell'utente
         if user.state != "start":
             # L'utente è impegnato in un altro comando
             return
     
-        text = f"Bentornato _{user.name}_\."
+        text = mex_manager.return_mex("saluto", user, update.message)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 async def unknown_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Ciao _{update.effective_user.full_name}_\.Per cominciare ad usare il bot, usa il comando /start', parse_mode='MarkdownV2')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("sconosciuto", None, update.message))
 
 # Comando /file
 async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -52,15 +52,15 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user.state = "file"
 
         inline_keyboard = [
-            [InlineKeyboardButton("Nuovo file", callback_data='new_file')],
-            [InlineKeyboardButton("Cambia file attivo", callback_data='change_active')],
-            [InlineKeyboardButton("Salva robe", callback_data='save_file')],
-            [InlineKeyboardButton("Scancellamento", callback_data='delete_file')]
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_1", user, update.message), callback_data='new_file')],
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_2", user, update.message), callback_data='change_active')],
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_3", user, update.message), callback_data='save_file')],
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_4", user, update.message), callback_data='delete_file')]
         ]
 
         await context.bot.send_message(
             chat_id=update.effective_chat.id, 
-            text="Cosa vuoi fare?",
+            text=mex_manager.return_mex("file_cmd_0", user, update.message),
             reply_markup=InlineKeyboardMarkup(inline_keyboard)
         )
 
@@ -80,7 +80,7 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # File creato
             await context.bot.send_message(
                 chat_id=update.effective_chat.id, 
-                text=f"Nuovo file creato: {(update.message.text).replace(' ', '_').lower()}.json"
+                text=mex_manager.return_mex("nuovo_file", user, update.message)
             )
 
             known_users.save_users()
@@ -88,7 +88,7 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # File non creato
             await context.bot.send_message(
                 chat_id=update.effective_chat.id, 
-                text=f"Sorry. Non posso creare il file"
+                text=mex_manager.return_mex("no_file", user, update.message)
             )
 
         # Reimposta lo stato
@@ -96,7 +96,7 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif user.state == "save":
         user.save(update.message.text)
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Salvato")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("salvato", user, update.message))
 
         user.state = "start"
     elif user.state == "change_active":
@@ -117,7 +117,7 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await change_active_file(user, update, context)
         return
     
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi quello che vuoi salvare")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("salva", user, update.message))
 
 async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
@@ -138,7 +138,7 @@ async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="Quale file vuoi cancellare?", 
+        text=mex_manager.return_mex("cancella", user, update.message), 
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
 
@@ -156,22 +156,25 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="Operazione annullata\nRIPETO\nOPERAZIONE ANNULLATA"
+        text=mex_manager.return_mex("back", user, update.message)
     )
 
 # Comando /about
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_, il miglior gestore di liste che tu possa mai desiderare\."
+    user = known_users.is_known_user(update.effective_user.id)
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     inline_keyboard = [
-        [InlineKeyboardButton("Lista completa dei comandi", callback_data='comandi_spiegazione')],
-        [InlineKeyboardButton("Versione del bot", callback_data='versione')],
-        [InlineKeyboardButton("Repository GitHub", url=github_repo_url)]
+        [InlineKeyboardButton(mex_manager.return_mex("about_1", user, update.message), callback_data='comandi_spiegazione')],
+        [InlineKeyboardButton(mex_manager.return_mex("about_2", user, update.message), callback_data='versione')],
+        [InlineKeyboardButton(mex_manager.return_mex("about_3", user, update.message), url=github_repo_url)]
     ]
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text=about_text, 
-        parse_mode='MarkdownV2',
+        text=mex_manager.return_mex("about_0", user, update.message),
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
 
@@ -191,14 +194,14 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Controlla la query
     if query.data == "comandi_spiegazione":
         # Messaggio con la spiegazione dei comandi
-        await mex_command_list(update, context)
+        await mex_command_list(user, update, context)
     elif query.data == "versione":
         # Messaggio con le informazioni riguardanti la versione attuale del bot
-        await mex_bot_version(update, context)
+        await mex_bot_version(user, update, context)
     elif query.data == "new_file":
         # Crea un nuovo file
         user.state = 'new_file'
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi il nome del file")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("nome_nuovo_file", user, update.message))
     elif query.data == "change_active":
         # Cambia il file attivo (file in cui viene salvata la roba)
         await change_active_file(user, update, context)
@@ -212,33 +215,32 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Cambia file attivo
         if user.state == "change_active":
             if user.change_active(query.data):
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="File attivato")
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("attivato", user, update.message))
             else:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile attivare il file")
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("non_attivato", user, update.message))
         # Cancella un file
         elif user.state == "delete":
             if user.delete_file(query.data):
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="File eliminato")
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("eliminato", user, update.message))
             else:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile eliminare il file")
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("non_eliminato", user, update.message))
             
             known_users.save_users()
         
         user.state = 'start'
 
-async def mex_command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
+async def mex_command_list(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("about_1", user, update.message))
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="_/start_: Manda un saluto all'utente;\n_/file_: Tutto ciò che serve per salvare le robe utili;\n_/save_: Salva sul file attivo;\n_/delete_: Cancella un file esistente;\n_/about_: Presentazione;\n_/back_: Annulla l'ultima operazione\.",
-        parse_mode='MarkdownV2'
+        text=mex_manager.return_mex("lista_comandi", user, update.message)
     )
 
-async def mex_bot_version(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.3_: Pronto per le traduzioni", parse_mode='MarkdownV2')
+async def mex_bot_version(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("versione_0", user, update.message))
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Mex\_Manager_: Gestione messaggi tramite tabelle e file json\.", parse_mode='MarkdownV2')
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex("versione_1", user, update.message))
 
 async def change_active_file(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     user.state = 'change_active'
@@ -246,9 +248,9 @@ async def change_active_file(user:UserInfo, update: Update, context: ContextType
     active_file = user.get_active_file()
     text = ''
     if active_file != None:
-        text = f'File attivo: {active_file}.\nQuale file vuoi attivare?'
+        text = mex_manager.return_mex("attiva", user, update.message)
     else:
-        text = f'Nessun file attivo.\nQuale file vuoi attivare?'
+        text = mex_manager.return_mex("attiva_vuoto", user, update.message)
     
     all_file = user.get_files()
     inline_keyboard = []
@@ -261,10 +263,6 @@ async def change_active_file(user:UserInfo, update: Update, context: ContextType
         text=text, 
         reply_markup=InlineKeyboardMarkup(inline_keyboard)
     )
-
-async def test_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex('saluta_2'))
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=mex_manager.return_mex('saluta'))
 
 if __name__ == '__main__':
     # Crea il bot
@@ -289,9 +287,6 @@ if __name__ == '__main__':
     # Comando /cancel
     cancel_handler = CommandHandler('back', cancel)
 
-    # Comando /test
-    test_handler = CommandHandler('test', test_cmd)
-
     # Prendi il nome del nuovo file da creare
     new_file_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), new_file)
 
@@ -303,7 +298,5 @@ if __name__ == '__main__':
     application.add_handler(cancel_handler)
     application.add_handler(about_handler)
     application.add_handler(command_list_handler)
-
-    application.add_handler(test_handler)
 
     application.run_polling()
