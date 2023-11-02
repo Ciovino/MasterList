@@ -1,6 +1,7 @@
 from secret_stuff import bot_token, github_repo_url
 from user_info import UserInfo
 from known_user_manager import KnownUserManager
+from mex_manager import MexManager
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import filters, ApplicationBuilder, MessageHandler, CommandHandler, CallbackQueryHandler, ContextTypes
@@ -10,7 +11,8 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-known_users = KnownUserManager('known_users.json')
+known_users = KnownUserManager('bot\\known_users.json')
+mex_manager = MexManager('bot\\bot_mex.json')
 
 # Comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -21,19 +23,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Aggiungi l'utente se è nuovo
         user = known_users.add_user(UserInfo(update.effective_user.id, update.effective_user.full_name, "start", []))
         
-        text = f"Ciao _{user.name}_\."
+        text = mex_manager.return_mex("primo_saluto", user, update.message)
     else:
         # Controlla lo stato dell'utente
         if user.state != "start":
             # L'utente è impegnato in un altro comando
             return
     
-        text = f"Bentornato _{user.name}_\."
+        text = mex_manager.return_mex("saluto", user, update.message)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=text, parse_mode='MarkdownV2')
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=text, 
+        parse_mode='MarkdownV2'
+    )
 
 async def unknown_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f'Ciao _{update.effective_user.full_name}_\.Per cominciare ad usare il bot, usa il comando /start', parse_mode='MarkdownV2')
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=mex_manager.return_mex("sconosciuto", None, update.message), 
+        parse_mode='MarkdownV2'
+    )
 
 # Comando /file
 async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -50,16 +60,17 @@ async def file_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user.state = "file"
 
         inline_keyboard = [
-            [InlineKeyboardButton("Nuovo file", callback_data='new_file')],
-            [InlineKeyboardButton("Cambia file attivo", callback_data='change_active')],
-            [InlineKeyboardButton("Salva robe", callback_data='save_file')],
-            [InlineKeyboardButton("Scancellamento", callback_data='delete_file')]
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_1", user, update.message), callback_data='new_file')],
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_2", user, update.message), callback_data='change_active')],
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_3", user, update.message), callback_data='save_file')],
+            [InlineKeyboardButton(mex_manager.return_mex("file_cmd_4", user, update.message), callback_data='delete_file')]
         ]
 
         await context.bot.send_message(
             chat_id=update.effective_chat.id, 
-            text="Cosa vuoi fare?",
-            reply_markup=InlineKeyboardMarkup(inline_keyboard)
+            text=mex_manager.return_mex("file_cmd_0", user, update.message),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard), 
+            parse_mode='MarkdownV2'
         )
 
 # Creazione di un nuovo file
@@ -78,7 +89,8 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # File creato
             await context.bot.send_message(
                 chat_id=update.effective_chat.id, 
-                text=f"Nuovo file creato: {(update.message.text).replace(' ', '_').lower()}.json"
+                text=mex_manager.return_mex("nuovo_file", user, update.message), 
+                parse_mode='MarkdownV2'
             )
 
             known_users.save_users()
@@ -86,7 +98,8 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # File non creato
             await context.bot.send_message(
                 chat_id=update.effective_chat.id, 
-                text=f"Sorry. Non posso creare il file"
+                text=mex_manager.return_mex("no_file", user, update.message), 
+                parse_mode='MarkdownV2'
             )
 
         # Reimposta lo stato
@@ -94,7 +107,11 @@ async def new_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif user.state == "save":
         user.save(update.message.text)
 
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Salvato")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=mex_manager.return_mex("salvato", user, update.message), 
+            parse_mode='MarkdownV2'
+        )
 
         user.state = "start"
     elif user.state == "change_active":
@@ -115,7 +132,11 @@ async def save_on_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await change_active_file(user, update, context)
         return
     
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi quello che vuoi salvare")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=mex_manager.return_mex("salva", user, update.message), 
+        parse_mode='MarkdownV2'
+    )
 
 async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Recupera le info dell'utente
@@ -136,8 +157,9 @@ async def delete_file(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="Quale file vuoi cancellare?", 
-        reply_markup=InlineKeyboardMarkup(inline_keyboard)
+        text=mex_manager.return_mex("cancella", user, update.message), 
+        reply_markup=InlineKeyboardMarkup(inline_keyboard), 
+        parse_mode='MarkdownV2'
     )
 
 # Comando /cancel
@@ -154,23 +176,28 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="Operazione annullata\nRIPETO\nOPERAZIONE ANNULLATA"
+        text=mex_manager.return_mex("back", user, update.message), 
+        parse_mode='MarkdownV2'
     )
 
 # Comando /about
 async def about(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    about_text = f"Ciao _{update.effective_user.full_name}_\.\nSono _MovList_, il miglior gestore di liste che tu possa mai desiderare\."
+    user = known_users.is_known_user(update.effective_user.id)
+    if user == None:
+        await unknown_user(update, context)
+        return
+
     inline_keyboard = [
-        [InlineKeyboardButton("Lista completa dei comandi", callback_data='comandi_spiegazione')],
-        [InlineKeyboardButton("Versione del bot", callback_data='versione')],
-        [InlineKeyboardButton("Repository GitHub", url=github_repo_url)]
+        [InlineKeyboardButton(mex_manager.return_mex("about_1", user, update.message), callback_data='comandi_spiegazione')],
+        [InlineKeyboardButton(mex_manager.return_mex("about_2", user, update.message), callback_data='versione')],
+        [InlineKeyboardButton(mex_manager.return_mex("about_3", user, update.message), url=github_repo_url)]
     ]
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text=about_text, 
-        parse_mode='MarkdownV2',
-        reply_markup=InlineKeyboardMarkup(inline_keyboard)
+        text=mex_manager.return_mex("about_0", user, update.message),
+        reply_markup=InlineKeyboardMarkup(inline_keyboard), 
+        parse_mode='MarkdownV2'
     )
 
 # Rispondi alle CallBackQuery
@@ -189,14 +216,18 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Controlla la query
     if query.data == "comandi_spiegazione":
         # Messaggio con la spiegazione dei comandi
-        await mex_command_list(update, context)
+        await mex_command_list(user, update, context)
     elif query.data == "versione":
         # Messaggio con le informazioni riguardanti la versione attuale del bot
-        await mex_bot_version(update, context)
+        await mex_bot_version(user, update, context)
     elif query.data == "new_file":
         # Crea un nuovo file
         user.state = 'new_file'
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Scrivi il nome del file")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=mex_manager.return_mex("nome_nuovo_file", user, update.message), 
+            parse_mode='MarkdownV2'
+        )
     elif query.data == "change_active":
         # Cambia il file attivo (file in cui viene salvata la roba)
         await change_active_file(user, update, context)
@@ -210,35 +241,68 @@ async def command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Cambia file attivo
         if user.state == "change_active":
             if user.change_active(query.data):
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="File attivato")
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, 
+                    text=mex_manager.return_mex("attivato", user, update.message), 
+                    parse_mode='MarkdownV2'
+                )
             else:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile attivare il file")
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, 
+                    text=mex_manager.return_mex("non_attivato", user, update.message), 
+                    parse_mode='MarkdownV2'
+                )
         # Cancella un file
         elif user.state == "delete":
             if user.delete_file(query.data):
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="File eliminato")
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, 
+                    text=mex_manager.return_mex("eliminato", user, update.message),
+                    parse_mode="Markdownv2"
+                )
             else:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text="Impossibile eliminare il file")
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, 
+                    text=mex_manager.return_mex("non_eliminato", user, update.message), 
+                    parse_mode="Markdownv2"
+                )
             
             known_users.save_users()
         
         user.state = 'start'
 
-async def mex_command_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Lista completa dei comandi")
-
+async def mex_command_list(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="_/start_: Manda un saluto all'utente;\n_/file_: Tutto ciò che serve per salvare le robe utili;\n_/save_: Salva sul file attivo;\n_/delete_: Cancella un file esistente;\n_/about_: Presentazione;\n_/back_: Annulla l'ultima operazione\.",
+        chat_id=update.effective_chat.id, 
+        text=mex_manager.return_mex("about_1", user, update.message), 
         parse_mode='MarkdownV2'
     )
 
-async def mex_bot_version(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="MovList _v0\.2\.1_: Presentazioni e Bug", parse_mode='MarkdownV2')
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=mex_manager.return_mex("lista_comandi", user, update.message), 
+        parse_mode='MarkdownV2'
+    )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Novità:\n\- _Nuova Presentazione_: Presentazione fatta meglio\.", parse_mode='MarkdownV2')
+async def mex_bot_version(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=mex_manager.return_mex("versione_intro", user, update.message), 
+        parse_mode='MarkdownV2'
+    )
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Bug Risolti:\n\- _Riconoscimento utente_: Issue \#5: Miglioramento dei controlli dell'utente che manda i messaggi\.", parse_mode="MarkdownV2")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=mex_manager.return_mex("versione_news", user, update.message), 
+        parse_mode='MarkdownV2'
+    )
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=mex_manager.return_mex("versione_bug", user, update.message), 
+        parse_mode='MarkdownV2', 
+        disable_web_page_preview=True
+    )
 
 async def change_active_file(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     user.state = 'change_active'
@@ -246,9 +310,9 @@ async def change_active_file(user:UserInfo, update: Update, context: ContextType
     active_file = user.get_active_file()
     text = ''
     if active_file != None:
-        text = f'File attivo: {active_file}.\nQuale file vuoi attivare?'
+        text = mex_manager.return_mex("attiva", user, update.message)
     else:
-        text = f'Nessun file attivo.\nQuale file vuoi attivare?'
+        text = mex_manager.return_mex("attiva_vuoto", user, update.message)
     
     all_file = user.get_files()
     inline_keyboard = []
@@ -258,8 +322,9 @@ async def change_active_file(user:UserInfo, update: Update, context: ContextType
     
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text=text, 
-        reply_markup=InlineKeyboardMarkup(inline_keyboard)
+        text=text,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard), 
+        parse_mode='MarkdownV2'
     )
 
 if __name__ == '__main__':

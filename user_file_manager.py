@@ -22,7 +22,7 @@ class UserFileManager:
             return False
 
         self.files.append(new_file_name)
-        self.active_file = new_file_name # Imposta come attivo il file appena creato
+        self.change_active(new_file_name) # Imposta come attivo il file appena creato
         return True
 
     def save(self, info:str):

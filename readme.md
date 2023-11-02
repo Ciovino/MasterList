@@ -2,12 +2,26 @@
 Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando sei indeciso.
 
 ## Changelog
+### Verisione 0.3 (Magia come parli)
+Nuova gestione dei messaggi del bot: l'ordine è importante.
+#### Novità
+- _Mex\_Manager_: Gestione messaggi tramite tabelle e file json.
+#### Bug Risolti
+- _Creazione di un nuovo file_: [Issue #7](https://github.com/Ciovino/Filmettini/issues/7): Durante la creazione di un nuovo file, veniva erroneamente salvato il contenuto dell'ultimo file attivo nel file appena creato.
+#### Comandi
+- */start*: Manda un saluto all'utente;
+- */file*: Tutto ciò che serve per salvare le robe utili;
+- */save*: Salva sul file attivo;
+- */delete*: Cancella un file esistente;
+- */about*: Presentazione del bot, per sapere abilità, versione e residenza;
+- */back*: Annulla l'ultima operazione.
+
 ### Versione 0.2.1 (Presentazioni e Bug)
 Una presentazione migliorata, leggermente più tecnica, e poi qualche bug in meno (si spera)
 #### Novità
 - _Nuova presentazione_: Presentazione fatta meglio.
 #### Bug Risolti
-- _Riconoscimento utente_: Issue #5: Miglioramento dei controlli dell'utente che manda i messaggi.
+- _Riconoscimento utente_: [Issue #5](https://github.com/Ciovino/Filmettini/issues/5): Miglioramento dei controlli dell'utente che manda i messaggi.
 #### Comandi
 - */start*: Manda un saluto all'utente;
 - */file*: Tutto ciò che serve per salvare le robe utili;
