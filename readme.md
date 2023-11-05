@@ -2,7 +2,7 @@
 Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando sei indeciso.
 
 ## Changelog
-### Verisione 0.3 (Magia come parli)
+### Verisione 0.3 (Ma come parli bene)
 Nuova gestione dei messaggi del bot: l'ordine è importante.
 #### Novità
 - _Mex\_Manager_: Gestione messaggi tramite tabelle e file json.
