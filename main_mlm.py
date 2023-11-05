@@ -297,13 +297,6 @@ async def mex_bot_version(user:UserInfo, update: Update, context: ContextTypes.D
         parse_mode='MarkdownV2'
     )
 
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, 
-        text=mex_manager.return_mex("versione_bug", user, update.message), 
-        parse_mode='MarkdownV2', 
-        disable_web_page_preview=True
-    )
-
 async def change_active_file(user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     user.state = 'change_active'
 

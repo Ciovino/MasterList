@@ -2,6 +2,18 @@
 Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando sei indeciso.
 
 ## Changelog
+### Versione 0.4 (Aspe che lo metto come stato di whatsapp)
+State Machine per tutti gli utenti.
+#### Novità
+- _User\_State\_Machine_: Macchina a stati finiti per gli utenti.
+#### Comandi
+- */start*: Manda un saluto all'utente;
+- */file*: Tutto ciò che serve per salvare le robe utili;
+- */save*: Salva sul file attivo;
+- */delete*: Cancella un file esistente;
+- */about*: Presentazione del bot, per sapere abilità, versione e residenza;
+- */back*: Annulla l'ultima operazione.
+
 ### Verisione 0.3 (Ma come parli bene)
 Nuova gestione dei messaggi del bot: l'ordine è importante.
 #### Novità
