@@ -1,5 +1,6 @@
 from secret_stuff import private_folder
 import os, json
+from utility import get_json_string
 
 # Gestisce la scrittura/lettura/salvataggio dei file privati dell'utente
 
@@ -79,16 +80,10 @@ class UserFileManager:
         open_file.close()
 
     def load_file(self, from_file: str):
-        all_lines = open(self.get_complete_file_name(from_file), 'r').readlines()
+        phrases = get_json_string(self.get_complete_file_name(from_file))
 
-        entire_file = ""
-        for line in all_lines:
-            entire_file = entire_file + (line.replace("\n", '').replace('  ', ''))
-
-        if entire_file != "":
-            phrases = json.loads(entire_file)
-            for phrase in phrases:
-                self.loaded_file.append(phrase['value'])
+        for phrase in phrases:
+            self.loaded_file.append(phrase['value'])
 
     def get_files(self) -> list[str]:
         return self.files

@@ -2,6 +2,7 @@ from secret_stuff import private_folder
 import json
 from user_info import UserInfo
 from telegram import Message
+from utility import get_json_string
 
 default_mex = "Messaggio di default"
 
@@ -11,20 +12,12 @@ class MexManager:
         self.mex = MexManager.load_mex(self.file_path)
 
     def load_mex(file_name:str) -> list[dict]:
-        mex_dict = []
-
         file_path = private_folder + file_name
+        all_mex = get_json_string(file_path)
 
-        mex_json = open(file_path, 'r').readlines()
-
-        entire_file = ""
-        for line in mex_json:
-            entire_file = entire_file + (line.replace("\n", '').replace('  ', ''))
-
-        if entire_file != "":
-            all_mex = json.loads(entire_file)
-            for mex in all_mex:
-                mex_dict.append({'id': mex['id'], 'formatting': mex['formatting'], 'format_value': mex['format_value'], 'code': mex['code'], 'value': mex['value']})
+        mex_dict = []
+        for mex in all_mex:
+            mex_dict.append({'id': mex['id'], 'formatting': mex['formatting'], 'format_value': mex['format_value'], 'code': mex['code'], 'value': mex['value']})
         
         return mex_dict
 
