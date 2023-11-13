@@ -52,6 +52,8 @@ class MexManager:
                 fill_placeholder.append(message.text)
             elif key == "text_file":
                 fill_placeholder.append((message.text).replace(' ', '_').lower())
+            elif key == "state":
+                fill_placeholder.append(current_user.get_current_state())
             else:
                 fill_placeholder.append("ERROR: NO KEY FOUND")
 

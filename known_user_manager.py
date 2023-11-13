@@ -29,7 +29,7 @@ class KnownUserManager:
 
         final_list = []
         for user in all_user:
-            final_list.append(UserInfo(user['id'], user['name'], "start", user['files']))
+            final_list.append(UserInfo(user['id'], user['name'], user['files']))
 
         return final_list
 
