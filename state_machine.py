@@ -7,8 +7,6 @@ class State:
         self.name = name
         self.type = type
         self.link = link
-
-        #print(f'{self.id} {self.name} {self.link}')
     
     def get_id(self) -> int:
         return self.id
@@ -52,10 +50,16 @@ class StateMachine:
         return state_found.get_id()
 
     def convert_id_to_name(self, id:int) -> str:
-        if id >= len(self.states):
-            return ''
+        state_found: State = None
+        for state in self.states:
+            if state.get_id() == id:
+                state_found = state
+                break
         
-        return self.states[id].get_name()
+        if state_found is None:
+            return -1
+        
+        return state_found.get_name()
     
     def valide_state_from_id(self, id:int) -> bool:
         return id < len(self.states) and id >= 0
@@ -76,12 +80,13 @@ class StateMachine:
         return self.current_state.is_valid_type('query')
     
     def get_state(self, name:str) -> State:
-        if not self.valid_state(name):
-            return None
-        
-        id = self.convert_name_to_id(name)
+        state_found: State = None
+        for state in self.states:
+            if state.get_name() == name:
+                state_found = state
+                break
 
-        return self.states[id]
+        return state_found
 
     def change(self, cmd:str) -> bool:
         new_state = self.get_state(cmd)
@@ -99,4 +104,4 @@ class StateMachine:
     
     def return_to_home_state(self) -> None:
         self.previous_state = self.current_state
-        self.current_state = self.states[0]
+        self.current_state = self.get_state('in_ascolto')
