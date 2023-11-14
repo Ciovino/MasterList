@@ -4,8 +4,8 @@ from bot_wrapper import BotWrapper
 
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
-from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd
+from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
+from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd, query_cmd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -50,6 +50,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'pappagallo':
         await pappagallo_cmd.execute(list_bot, user, update, context)
         return
+    
+    if command == 'query':
+        await query_cmd.execute(list_bot, user, update, context)
+        return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -62,6 +66,26 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = list_bot.return_mex("echo", user, update.message)
         )
 
+async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = list_bot.is_known_user(update.effective_user.id)
+    if user == None:
+        user = list_bot.add_user(UserInfo(update.effective_user.id, update.effective_user.full_name, []))
+
+    if user.get_current_state() != 'query':
+        return
+
+    query = update.callback_query
+
+    await query.answer()
+    await query.delete_message()
+
+    await context.bot.send_message(
+        chat_id = update.effective_chat.id,
+        text = query.data
+    )
+
+    await query_cmd.execute(list_bot, user, update, context)
+
 if __name__ == '__main__':
     # Crea il bot
     application = ApplicationBuilder().token(bot_token).build()
@@ -73,6 +97,10 @@ if __name__ == '__main__':
     # Messaggi normali
     normal_message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), normal_message)
     application.add_handler(normal_message_handler)
+
+    # Callback query
+    callback_query_handler = CallbackQueryHandler(callback_query)
+    application.add_handler(callback_query_handler)
 
     # Avvia il bot
     application.run_polling()
