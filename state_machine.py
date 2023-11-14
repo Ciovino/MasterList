@@ -40,7 +40,7 @@ class StateMachine:
         return self.previous_state.get_name()
 
     def convert_name_to_id(self, name:str) -> int:
-        state_found = State
+        state_found: State = None
         for state in self.states:
             if state.get_name() == name:
                 state_found = state
