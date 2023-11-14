@@ -5,7 +5,7 @@ from bot_wrapper import BotWrapper
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd, count_cmd, query_cmd, about_cmd
+from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd, count_cmd, query_cmd, about_cmd, file_cmd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -62,6 +62,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'about':
         await about_cmd.execute(list_bot, user, update, context)
         return
+    
+    if command == 'file':
+        await file_cmd.execute(list_bot, user, update, context)
+        return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -117,6 +121,10 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif query.data == 'versione':
             await about_cmd.versione(list_bot, user, update, context)
 
+        user.return_to_home_state()
+        return
+    
+    if state == 'file':
         user.return_to_home_state()
         return
 
