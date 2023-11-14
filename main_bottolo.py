@@ -66,6 +66,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'file':
         await file_cmd.execute(list_bot, user, update, context)
         return
+    
+    if command == 'crea':
+        await file_cmd.crea(list_bot, user, update, context)
+        return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -89,6 +93,25 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id = update.effective_chat.id,
             text = f'{len(update.message.text.split(" "))}'
         )
+        return
+    
+    if state == 'crea':
+        if user.add_file(update.message.text):
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, 
+                text=list_bot.return_mex("nuovo_file", user, update.message), 
+                parse_mode='MarkdownV2'
+            )
+
+            list_bot.save_user()
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, 
+                text=list_bot.return_mex("no_file", user, update.message), 
+                parse_mode='MarkdownV2'
+            )
+        
+        user.return_to_home_state()
         return
 
 async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -125,7 +148,10 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if state == 'file':
-        user.return_to_home_state()
+        if query.data == 'crea':
+            await file_cmd.crea(list_bot, user, update, context)
+            user.change_state('crea')
+
         return
 
 if __name__ == '__main__':

@@ -16,3 +16,6 @@ class BotWrapper:
 
     def return_mex(self, code:str, user:UserInfo, text_message:Message) -> str:
         return self.mex_manager.return_mex(code, user, text_message)
+    
+    def save_user(self) -> None:
+        self.known_user_manager.save_users()
