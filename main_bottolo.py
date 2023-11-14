@@ -5,7 +5,7 @@ from bot_wrapper import BotWrapper
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd, count_cmd, query_cmd
+from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd, count_cmd, query_cmd, about_cmd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -58,6 +58,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'query':
         await query_cmd.execute(list_bot, user, update, context)
         return
+    
+    if command == 'about':
+        await about_cmd.execute(list_bot, user, update, context)
+        return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -86,15 +90,15 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
     if user == None:
-        user = list_bot.add_user(UserInfo(update.effective_user.id, update.effective_user.full_name, []))
-
-    if not user.is_query_state():
-        return
+        user = list_bot.add_user(UserInfo(update.effective_user.id, update.effective_user.full_name, []))    
 
     query = update.callback_query
 
     await query.answer()
     await query.delete_message()
+
+    if not user.is_query_state():
+        return
 
     state = user.get_current_state()
     
@@ -104,7 +108,17 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = query.data
         )
 
-    await query_cmd.execute(list_bot, user, update, context)
+        user.return_to_home_state()
+        return
+    
+    if state == 'about':
+        if query.data == 'lista_comandi':
+            await about_cmd.lista_comandi(list_bot, user, update, context)
+        elif query.data == 'versione':
+            await about_cmd.versione(list_bot, user, update, context)
+
+        user.return_to_home_state()
+        return
 
 if __name__ == '__main__':
     # Crea il bot

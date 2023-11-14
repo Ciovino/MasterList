@@ -27,6 +27,9 @@ class UserInfo:
 
         return self.state.change(cmd)
     
+    def return_to_home_state(self) -> None:
+        self.state.return_to_home_state()
+    
     def get_current_state(self) -> str:
         return self.state.get_current_state()
     

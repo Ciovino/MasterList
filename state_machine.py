@@ -96,3 +96,7 @@ class StateMachine:
         self.current_state = new_state
 
         return True
+    
+    def return_to_home_state(self) -> None:
+        self.previous_state = self.current_state
+        self.current_state = self.states[0]
