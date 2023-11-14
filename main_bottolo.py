@@ -78,6 +78,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'salva':
         await file_cmd.salva(list_bot, user, update, context)
         return
+    
+    if command == 'cancella':
+        await file_cmd.cancella(list_bot, user, update, context)
+        return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -177,6 +181,9 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif query.data == 'salva':
             await file_cmd.salva(list_bot, user, update, context)
             user.change_state('salva')
+        elif query.data == 'cancella':
+            await file_cmd.cancella(list_bot, user, update, context)
+            user.change_state('cancella')
 
         return
     
@@ -194,6 +201,26 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode='MarkdownV2'
             )
         
+        user.return_to_home_state()
+        return
+    
+    if state == 'cancella':
+        if user.delete_file(query.data):
+            await context.bot.send_message(
+                    chat_id=update.effective_chat.id, 
+                    text=list_bot.return_mex("eliminato", user, update.message),
+                    parse_mode="Markdownv2"
+                )
+            
+        else:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, 
+                text=list_bot.return_mex("non_eliminato", user, update.message), 
+                parse_mode="Markdownv2"
+            )
+        
+        list_bot.save_user()
+
         user.return_to_home_state()
         return
 

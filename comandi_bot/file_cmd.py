@@ -10,7 +10,7 @@ async def execute(the_bot:BotWrapper, user:UserInfo, update: Update, context: Co
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_1", user, update.message), callback_data='crea')],
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_2", user, update.message), callback_data='cambia')],
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_3", user, update.message), callback_data='salva')],
-        [InlineKeyboardButton(the_bot.return_mex("file_cmd_4", user, update.message), callback_data='delete_file')]        
+        [InlineKeyboardButton(the_bot.return_mex("file_cmd_4", user, update.message), callback_data='cancella')]        
     ]
 
     await context.bot.send_message(
@@ -58,5 +58,19 @@ async def salva(the_bot:BotWrapper, user:UserInfo, update: Update, context: Cont
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
         text=the_bot.return_mex("salva", user, update.message), 
+        parse_mode='MarkdownV2'
+    )
+
+async def cancella(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    all_file = user.get_files()
+    inline_keyboard = []
+
+    for file in all_file:
+        inline_keyboard.append([InlineKeyboardButton(file, callback_data=file)])
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=the_bot.return_mex("cancella", user, update.message), 
+        reply_markup=InlineKeyboardMarkup(inline_keyboard), 
         parse_mode='MarkdownV2'
     )
