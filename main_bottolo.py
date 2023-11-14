@@ -5,7 +5,7 @@ from bot_wrapper import BotWrapper
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from comandi_bot import state_cmd, back_cmd, start_cmd, pappagallo_cmd, count_cmd, query_cmd, about_cmd, file_cmd
+from comandi_bot import state_cmd, back_cmd, start_cmd, about_cmd, file_cmd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -47,18 +47,6 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await state_cmd.execute(list_bot, user, update, context)
         return
     
-    if command == 'pappagallo':
-        await pappagallo_cmd.execute(list_bot, user, update, context)
-        return
-    
-    if command == 'count':
-        await count_cmd.execute(list_bot, user, update, context)
-        return
-    
-    if command == 'query':
-        await query_cmd.execute(list_bot, user, update, context)
-        return
-    
     if command == 'about':
         await about_cmd.execute(list_bot, user, update, context)
         return
@@ -92,20 +80,6 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     state = user.get_current_state()
-
-    if state == 'pappagallo':
-        await context.bot.send_message(
-            chat_id = update.effective_chat.id,
-            text = list_bot.return_mex("echo", user, update.message)
-        )
-        return
-
-    if state == 'count':
-        await context.bot.send_message(
-            chat_id = update.effective_chat.id,
-            text = f'{len(update.message.text.split(" "))}'
-        )
-        return
     
     if state == 'crea':
         if user.add_file(update.message.text):
@@ -152,15 +126,6 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     state = user.get_current_state()
-    
-    if state == 'query':
-        await context.bot.send_message(
-            chat_id = update.effective_chat.id,
-            text = query.data
-        )
-
-        user.return_to_home_state()
-        return
     
     if state == 'about':
         if query.data == 'lista_comandi':
