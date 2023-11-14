@@ -74,6 +74,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if command == 'cambia':
         await file_cmd.cambia(list_bot, user, update, context)
         return
+    
+    if command == 'salva':
+        await file_cmd.salva(list_bot, user, update, context)
+        return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -118,6 +122,18 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user.return_to_home_state()
         return
 
+    if state == 'salva':
+        user.save(update.message.text)
+
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=list_bot.return_mex("salvato", user, update.message), 
+            parse_mode='MarkdownV2'
+        )
+        
+        user.return_to_home_state()
+        return
+
 async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
     if user == None:
@@ -158,6 +174,9 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif query.data == 'cambia':
             await file_cmd.cambia(list_bot, user, update, context)
             user.change_state('cambia')
+        elif query.data == 'salva':
+            await file_cmd.salva(list_bot, user, update, context)
+            user.change_state('salva')
 
         return
     

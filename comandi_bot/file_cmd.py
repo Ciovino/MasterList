@@ -9,7 +9,7 @@ async def execute(the_bot:BotWrapper, user:UserInfo, update: Update, context: Co
     inline_keyboard = [
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_1", user, update.message), callback_data='crea')],
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_2", user, update.message), callback_data='cambia')],
-        [InlineKeyboardButton(the_bot.return_mex("file_cmd_3", user, update.message), callback_data='save')],
+        [InlineKeyboardButton(the_bot.return_mex("file_cmd_3", user, update.message), callback_data='salva')],
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_4", user, update.message), callback_data='delete_file')]        
     ]
 
@@ -46,5 +46,17 @@ async def cambia(the_bot:BotWrapper, user:UserInfo, update: Update, context: Con
         chat_id=update.effective_chat.id, 
         text=text,
         reply_markup=InlineKeyboardMarkup(inline_keyboard), 
+        parse_mode='MarkdownV2'
+    )
+
+async def salva(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if user.get_active_file() == None:
+        user.change_state('cambia')
+        await cambia(the_bot, user, update, context)
+        return
+
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=the_bot.return_mex("salva", user, update.message), 
         parse_mode='MarkdownV2'
     )
