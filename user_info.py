@@ -15,6 +15,12 @@ class UserInfo:
     def is_valid_command(self, cmd: str) -> bool:
         return self.state.valid_state(cmd)
 
+    def is_mex_state(self) -> bool:
+        return self.state.valid_mex()
+    
+    def is_query_state(self) -> bool:
+        return self.state.valid_query()
+
     def change_state(self, cmd:str) -> bool:
         if not self.is_valid_command(cmd):
             return False

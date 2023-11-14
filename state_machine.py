@@ -2,9 +2,10 @@ from utility import get_json_string
 from secret_stuff import private_folder
 
 class State:
-    def __init__(self, id:int, name:str, link:list[int]) -> None:
+    def __init__(self, id:int, name:str, type:list[str], link:list[int]) -> None:
         self.id = id
         self.name = name
+        self.type = type
         self.link = link
 
         #print(f'{self.id} {self.name} {self.link}')
@@ -15,6 +16,9 @@ class State:
     def get_name(self) -> str:
         return self.name
     
+    def is_valid_type(self, type:str) -> bool:
+        return type in self.type
+    
     def allowed_change(self, new_state:int) -> bool:
         return new_state in self.link
 
@@ -24,7 +28,7 @@ class StateMachine:
 
         self.states = []
         for state in all_state:
-            self.states.append(State(state['id'], state['name'], state['link']))
+            self.states.append(State(state['id'], state['name'], state['type'], state['link']))
 
         self.current_state = self.states[0]
         self.previous_state = self.states[0]
@@ -61,6 +65,15 @@ class StateMachine:
         #print(id)
 
         return self.valide_state_from_id(id)
+    
+    def valid_command(self) -> bool:
+        return self.current_state.is_valid_type('cmd')
+    
+    def valid_mex(self) -> bool:
+        return self.current_state.is_valid_type('mex')
+
+    def valid_query(self) -> bool:
+        return self.current_state.is_valid_type('query')
     
     def get_state(self, name:str) -> State:
         if not self.valid_state(name):
