@@ -1,6 +1,7 @@
 import json
 from secret_stuff import private_folder
 from user_info import UserInfo
+from utility import get_json_string
 
 # Si occupa di riconoscere e salvare nuovi utenti
 
@@ -24,21 +25,13 @@ class KnownUserManager:
         return None
 
     def load_user(file_name) -> list[UserInfo]:
-        local_list = []
+        all_user = get_json_string(file_name)
 
-        # Json file with all the known users
-        users_in_file = open(file_name, 'r').readlines()
+        final_list = []
+        for user in all_user:
+            final_list.append(UserInfo(user['id'], user['name'], user['files']))
 
-        entire_file = ""
-        for line in users_in_file:
-            entire_file = entire_file + (line.replace("\n", '').replace('  ', ''))
-
-        if entire_file != "":
-            all_user = json.loads(entire_file)
-            for user in all_user:
-                local_list.append(UserInfo(user['id'], user['name'], "start", user['files']))
-
-        return local_list
+        return final_list
 
     # Save all knwon user in the json file
     def save_users(self) -> None:

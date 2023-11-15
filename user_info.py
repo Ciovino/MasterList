@@ -1,15 +1,40 @@
-import json, os
+import json
 from user_file_manager import UserFileManager
+from state_machine import StateMachine
 
 # Racchiude tutte le informazioni di un utente
 
 class UserInfo:
-    def __init__(self, id:int, name:str, state, files:list) -> None:
+    def __init__(self, id:int, name:str, files:list) -> None:
         self.id = id
         self.name = name
-        self.state = state
+        self.state = StateMachine('bot\\state.json')
 
         self.file_manager = UserFileManager(id, files)
+
+    def is_valid_command(self, cmd: str) -> bool:
+        return self.state.valid_state(cmd)
+
+    def is_mex_state(self) -> bool:
+        return self.state.valid_mex()
+    
+    def is_query_state(self) -> bool:
+        return self.state.valid_query()
+
+    def change_state(self, cmd:str) -> bool:
+        if not self.is_valid_command(cmd):
+            return False
+
+        return self.state.change(cmd)
+    
+    def return_to_home_state(self) -> None:
+        self.state.return_to_home_state()
+    
+    def get_current_state(self) -> str:
+        return self.state.get_current_state()
+    
+    def get_previous_state(self) -> str:
+        return self.state.get_previous_state()
 
     # Controlla se è lo stesso utente
     def same_user(self, other) -> bool:

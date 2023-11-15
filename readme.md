@@ -1,7 +1,23 @@
-# Filmettini
-Bot che gestisce la tua lista di film e che sceglie per te cosa vedere quando sei indeciso.
+# MasterList
+Il bot telegram per gestire diversi tipi di liste: ricettario, inventario, serie e film da guardare, playlist, lista della spesa...
 
 ## Changelog
+### Versione 0.4 (Praticamente come nuovo)
+Nuovo codice, nuova organizzazione, anche nuovo nome.
+#### Novità
+- _State\_Machine_: Macchina a stati finiti per gli utenti;
+- _Comando /state_: Per visualizzare in quale magnifico stato ti trovi ([Suggestion #10](https://github.com/Ciovino/Filmettini/issues/10)).
+#### Comandi
+- */start*: Manda un saluto all'utente;
+- */file*: Tutto ciò che serve per salvare le robe utili;
+- */crea*: Crea nuovi file;
+- */cambia*: Cambia il file attivo;
+- */salva*: Salva sul file attivo;
+- */cancella*: Cancella un file esistente;
+- */about*: Presentazione del bot, per sapere abilità, versione e residenza;
+- */state*: Visualizza il nome dello stato;
+- */back*: Annulla l'ultima operazione.
+
 ### Verisione 0.3 (Ma come parli bene)
 Nuova gestione dei messaggi del bot: l'ordine è importante.
 #### Novità
