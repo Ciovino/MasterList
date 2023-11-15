@@ -44,5 +44,6 @@ async def versione(the_bot:BotWrapper, user:UserInfo, update: Update, context: C
     await context.bot.send_message(
         chat_id = update.effective_chat.id, 
         text = the_bot.return_mex("versione_news", user, update.message), 
-        parse_mode = 'MarkdownV2'
+        parse_mode = 'MarkdownV2', 
+        disable_web_page_preview = True
     )

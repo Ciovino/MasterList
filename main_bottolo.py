@@ -29,10 +29,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not user.change_state(command):
-        await context.bot.send_message(
+        """await context.bot.send_message(
             chat_id = update.effective_chat.id,
             text = "impossibile cambiare stato"
-        )
+        )"""
         return
 
     if command == 'back':
