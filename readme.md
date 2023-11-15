@@ -2,6 +2,13 @@
 Il bot telegram per gestire diversi tipi di liste: ricettario, inventario, serie e film da guardare, playlist, lista della spesa...
 
 ## Changelog
+### Versione 0.5 (Usiamoli un po' meglio sti file)
+Miglioramento nell'utilizzo delle liste: puoi vedere cosa hai salvato, cancellare alcune frasi, modificarne altre e basta per ora.
+#### Novità
+Mo che mi vengono in mente le scrivo
+#### Comandi
+Gli stessi di prima (forse)
+
 ### Versione 0.4 (Praticamente come nuovo)
 Nuovo codice, nuova organizzazione, anche nuovo nome.
 #### Novità
