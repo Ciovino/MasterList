@@ -54,6 +54,8 @@ class MexManager:
                 fill_placeholder.append((message.text).replace(' ', '\_').lower())
             elif key == "state":
                 fill_placeholder.append(current_user.get_current_state())
+            elif key == "max_lines":                
+                fill_placeholder.append(len(current_user.show()))
             else:
                 fill_placeholder.append("ERROR: NO KEY FOUND")
 

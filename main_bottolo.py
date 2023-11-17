@@ -65,8 +65,7 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if command == 'salva':
         await file_cmd.salva(list_bot, user, update, context)
-        return
-    
+        return    
 
     if command == 'mostra':
         await file_cmd.mostra(list_bot, user, update, context)
@@ -74,6 +73,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if command == 'cancella':
         await file_cmd.cancella(list_bot, user, update, context)
+        return
+    
+    if command == 'elimina':
+        await file_cmd.elimina(list_bot, user, update, context)
         return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -108,6 +111,26 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if state == 'salva':
         await file_cmd.salva_su_file(list_bot, user, update.message.text, update, context)
         return
+    
+    if state == 'cancella':
+        try:
+            riga_da_cancellare = int(update.message.text)
+            riga_cancellata = user.delete_line(riga_da_cancellare)
+
+            if riga_cancellata < 0:
+                # La riga non è stata cancellata perchè il numero inserito era fuori dai limiti
+                messaggio = list_bot.return_mex("fuori_limite", user, update.message)
+            else:
+                messaggio = list_bot.return_mex("cancellata", user, update.message)
+                user.return_to_home_state()
+        except ValueError:
+            messaggio = list_bot.return_mex("value_error", user, update.message)
+
+        await context.bot.send_message(
+            chat_id = update.effective_chat.id,
+            text = messaggio
+        )
+        return
 
 async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = list_bot.is_known_user(update.effective_user.id)
@@ -117,7 +140,7 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
     await query.answer()
-    await query.delete_message()
+    ## await query.delete_message()
 
     if not user.is_query_state():
         return
@@ -135,17 +158,20 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if state == 'file':
         if query.data == 'crea':
-            await file_cmd.crea(list_bot, user, update, context)
             user.change_state('crea')
+            await file_cmd.crea(list_bot, user, update, context)
+
         elif query.data == 'cambia':
-            await file_cmd.cambia(list_bot, user, update, context)
             user.change_state('cambia')
+            await file_cmd.cambia(list_bot, user, update, context)
+
         elif query.data == 'salva':
-            await file_cmd.salva(list_bot, user, update, context)
             user.change_state('salva')
-        elif query.data == 'cancella':
-            await file_cmd.cancella(list_bot, user, update, context)
-            user.change_state('cancella')
+            await file_cmd.salva(list_bot, user, update, context)
+
+        elif query.data == 'elimina':
+            user.change_state('elimina')
+            await file_cmd.elimina(list_bot, user, update, context)
 
         return
     
@@ -166,7 +192,19 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user.return_to_home_state()
         return
     
-    if state == 'cancella':
+    if state == 'mostra':
+        if query.data == 'back':
+            user.change_state('back')
+            await back_cmd.execute(list_bot, user, update, context)
+
+        elif query.data == 'cancella':
+            user.change_state('cancella')
+            await file_cmd.cancella(list_bot, user, update, context)
+
+        return
+
+
+    if state == 'elimina':
         if user.delete_file(query.data):
             await context.bot.send_message(
                     chat_id=update.effective_chat.id, 

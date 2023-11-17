@@ -32,6 +32,15 @@ class UserFileManager:
 
     def show(self) -> list[str]:
         return self.loaded_file
+    
+    def delete_line(self, line_to_delete: int) -> int:
+        if line_to_delete >= len(self.loaded_file) or line_to_delete < 0:
+            return -len(self.loaded_file)
+        
+        del self.loaded_file[line_to_delete]
+
+        self.save_on_file(self.active_file)
+        return line_to_delete
 
     def delete(self, file_to_delete:str):
         if not self.is_file(file_to_delete):

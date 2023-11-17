@@ -61,6 +61,9 @@ class UserInfo:
     def show(self) -> list[str]:
         return self.file_manager.show()
 
+    def delete_line(self, line_to_delete: int) -> int:
+        return self.file_manager.delete_line(line_to_delete - 1)
+
     def delete_file(self, file_to_delete:str):
         return self.file_manager.delete(file_to_delete)
 

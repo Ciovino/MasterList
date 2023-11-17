@@ -10,7 +10,7 @@ async def execute(the_bot:BotWrapper, user:UserInfo, update: Update, context: Co
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_1", user, update.message), callback_data='crea')],
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_2", user, update.message), callback_data='cambia')],
         [InlineKeyboardButton(the_bot.return_mex("file_cmd_3", user, update.message), callback_data='salva')],
-        [InlineKeyboardButton(the_bot.return_mex("file_cmd_4", user, update.message), callback_data='cancella')]        
+        [InlineKeyboardButton(the_bot.return_mex("file_cmd_4", user, update.message), callback_data='elimina')]        
     ]
 
     await context.bot.send_message(
@@ -87,24 +87,34 @@ async def mostra(the_bot:BotWrapper, user:UserInfo, update: Update, context: Con
         user.change_state('cambia')
         await cambia(the_bot, user, update, context)
         return
-    
-    file_content = user.show()
-    if len(file_content) == 0:
-        messaggio_da_compilare = the_bot.return_mex("file_vuoto", user, update.message)
-    else:
-        messaggio_da_compilare = the_bot.return_mex("file_pieno", user, update.message)
 
-    for riga in file_content:
-        messaggio_da_compilare += f'\n- {riga}'
+    inline_keyboard = [[InlineKeyboardButton("Torna indietro", callback_data='back')]]
+
+    file_content = user.show()
+    file_pieno = len(file_content) > 0
+    if file_pieno:
+        messaggio_da_compilare = the_bot.return_mex("file_pieno", user, update.message)
+        inline_keyboard.append([InlineKeyboardButton("Cancella una riga", callback_data='cancella')])
+    else:
+        messaggio_da_compilare = the_bot.return_mex("file_vuoto", user, update.message)
+
+    for i in range(0,len(file_content)):
+        messaggio_da_compilare += f'\n{i+1}) {file_content[i]}'
 
     await context.bot.send_message(
         chat_id = update.effective_chat.id,
-        text = messaggio_da_compilare
+        text = messaggio_da_compilare,
+        reply_markup = InlineKeyboardMarkup(inline_keyboard)
     )
 
-    user.return_to_home_state()
-
 async def cancella(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text="Quale riga vuoi cancellare?", 
+        parse_mode='MarkdownV2'
+    )
+
+async def elimina(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     all_file = user.get_files()
     inline_keyboard = []
 
@@ -113,7 +123,7 @@ async def cancella(the_bot:BotWrapper, user:UserInfo, update: Update, context: C
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text=the_bot.return_mex("cancella", user, update.message), 
+        text=the_bot.return_mex("elimina", user, update.message), 
         reply_markup=InlineKeyboardMarkup(inline_keyboard), 
         parse_mode='MarkdownV2'
     )
