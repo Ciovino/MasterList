@@ -1,11 +1,11 @@
 from secret_stuff import bot_token
 from user_info import UserInfo
 from bot_wrapper import BotWrapper
+from comandi_bot import state_cmd, back_cmd, start_cmd, about_cmd, file_cmd
 
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from comandi_bot import state_cmd, back_cmd, start_cmd, about_cmd, file_cmd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -101,15 +101,7 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if state == 'salva':
-        user.save(update.message.text)
-
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, 
-            text=list_bot.return_mex("salvato", user, update.message), 
-            parse_mode='MarkdownV2'
-        )
-        
-        user.return_to_home_state()
+        await file_cmd.salva_su_file(list_bot, user, update.message.text, update, context)
         return
 
 async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):

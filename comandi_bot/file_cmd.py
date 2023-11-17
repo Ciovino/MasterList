@@ -54,12 +54,33 @@ async def salva(the_bot:BotWrapper, user:UserInfo, update: Update, context: Cont
         user.change_state('cambia')
         await cambia(the_bot, user, update, context)
         return
+    
+    # str.partition(_sep:str) ritorna una tupla composta da 3 elementi: (first, separator, rest)
+    # first è la stringa prima del separatore
+    # separator è la prima occorrenza trovata del separatore
+    # rest è la stringa dopo il separatore
+    # se la stringa non può essere divisa, rest e separator sono stringhe vuote
+    _, _, da_salvare = update.message.text.partition(" ")
+    if len(da_salvare) > 0:
+        await salva_su_file(the_bot, user, da_salvare, update, context)
+        return
 
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
         text=the_bot.return_mex("salva", user, update.message), 
         parse_mode='MarkdownV2'
     )
+
+async def salva_su_file(the_bot:BotWrapper, user:UserInfo, da_salvare:str, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user.save(da_salvare)
+
+    await context.bot.send_message(
+            chat_id=update.effective_chat.id, 
+            text=the_bot.return_mex("salvato", user, update.message), 
+            parse_mode='MarkdownV2'
+        )
+    
+    user.return_to_home_state()
 
 async def cancella(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     all_file = user.get_files()
