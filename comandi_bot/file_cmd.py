@@ -94,7 +94,8 @@ async def mostra(the_bot:BotWrapper, user:UserInfo, update: Update, context: Con
     file_pieno = len(file_content) > 0
     if file_pieno:
         messaggio_da_compilare = the_bot.return_mex("file_pieno", user, update.message)
-        inline_keyboard.append([InlineKeyboardButton("Cancella una riga", callback_data='cancella')])
+        inline_keyboard.append([InlineKeyboardButton("Cancella una riga", callback_data='cancella'),
+                                InlineKeyboardButton("Modifica una riga", callback_data='modifica')])
     else:
         messaggio_da_compilare = the_bot.return_mex("file_vuoto", user, update.message)
 
@@ -110,7 +111,14 @@ async def mostra(the_bot:BotWrapper, user:UserInfo, update: Update, context: Con
 async def cancella(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id, 
-        text="Quale riga vuoi cancellare?", 
+        text=the_bot.return_mex("cancella_intro", user, update.message), 
+        parse_mode='MarkdownV2'
+    )
+
+async def modifica(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, 
+        text=the_bot.return_mex("modifica_intro", user, update.message), 
         parse_mode='MarkdownV2'
     )
 

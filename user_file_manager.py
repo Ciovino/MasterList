@@ -30,6 +30,14 @@ class UserFileManager:
         self.loaded_file.append(info)
         self.save_on_file(self.active_file)
 
+    def save_at_index(self, info:str, idx:int) -> bool:
+        if idx == -1:
+            return False
+
+        self.loaded_file[idx] = info
+        self.save_on_file(self.active_file)
+        return True
+
     def show(self) -> list[str]:
         return self.loaded_file
     

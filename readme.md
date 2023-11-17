@@ -8,11 +8,13 @@ Miglioramento nell'utilizzo delle liste: puoi vedere cosa hai salvato, cancellar
 - _Aggiornamento comando /salva_: Ora puoi scrivere il messaggio da salvare dopo il comando;
 - _Nuovo comando /mostra_: Visualizza l'intero contenuto del file attivo;
 - _Comando /elimina_: Il comando _/cancella_ vecchio (per cancellare file interi) diventa _/elimina_;
-- _Nuovo comando /cancella_: Cancella una riga dal file attivo.
+- _Nuovo comando /cancella_: Cancella una riga dal file attivo;
+- _Nuovo comando /modifica_: Modifica una riga dal file attivo.
 #### Comandi
 - _/salva \[messaggio da salvare\]_: Salva sul file attivo;
 - _/mostra_: Visualizza file attivo;
-- _/cancella \[riga\]_: Cancella una riga da un file;
+- _/cancella_: Cancella una riga da un file;
+- _/modifica_: Modifica una riga da un file;
 - _/elimina_: Elimina un file esistente.
 
 ### Versione 0.4 (Praticamente come nuovo)

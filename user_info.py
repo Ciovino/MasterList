@@ -58,6 +58,9 @@ class UserInfo:
     def save(self, phrase: str):
         self.file_manager.save(phrase)
 
+    def save_at_index(self, phrase:str, idx:int) -> bool:
+        return self.file_manager.save_at_index(phrase, idx)
+
     def show(self) -> list[str]:
         return self.file_manager.show()
 

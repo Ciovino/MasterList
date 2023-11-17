@@ -75,6 +75,10 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await file_cmd.cancella(list_bot, user, update, context)
         return
     
+    if command == 'modifica':
+        await file_cmd.modifica(list_bot, user, update, context)
+        return
+    
     if command == 'elimina':
         await file_cmd.elimina(list_bot, user, update, context)
         return
@@ -130,6 +134,39 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id = update.effective_chat.id,
             text = messaggio
         )
+        return
+    
+    if state == 'modifica':
+        try:
+            riga_da_modificare = int(update.message.text)
+
+            if riga_da_modificare <= 0 or riga_da_modificare > len(user.show()):                
+                messaggio = list_bot.return_mex("fuori_limite", user, update.message)
+            else:
+                messaggio = list_bot.return_mex("modifica_in_corso", user, update.message)
+                list_bot.modify_line(riga_da_modificare-1)
+                user.change_state('modifica_in_corso')
+        except ValueError:
+            messaggio = list_bot.return_mex("value_error", user, update.message)
+
+        await context.bot.send_message(
+            chat_id = update.effective_chat.id,
+            text = messaggio
+        )
+        return
+    
+    if state == 'modifica_in_corso':
+        if user.save_at_index(update.message.text, list_bot.get_modified_line()):
+            messaggio = list_bot.return_mex("modifica_fatta", user, update.message)
+        else:
+            messaggio = list_bot.return_mex("modifica_fallita", user, update.message)
+
+        await context.bot.send_message(
+            chat_id = update.effective_chat.id,
+            text = list_bot.return_mex("modifica_fatta", user, update.message)
+        )
+
+        user.return_to_home_state()
         return
 
 async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -201,8 +238,11 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
             user.change_state('cancella')
             await file_cmd.cancella(list_bot, user, update, context)
 
-        return
+        elif query.data == 'modifica':
+            user.change_state('modifica')
+            await file_cmd.modifica(list_bot, user, update, context)
 
+        return
 
     if state == 'elimina':
         if user.delete_file(query.data):
