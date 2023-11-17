@@ -67,6 +67,11 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await file_cmd.salva(list_bot, user, update, context)
         return
     
+
+    if command == 'mostra':
+        await file_cmd.mostra(list_bot, user, update, context)
+        return
+    
     if command == 'cancella':
         await file_cmd.cancella(list_bot, user, update, context)
         return

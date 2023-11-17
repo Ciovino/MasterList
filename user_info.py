@@ -58,6 +58,9 @@ class UserInfo:
     def save(self, phrase: str):
         self.file_manager.save(phrase)
 
+    def show(self) -> list[str]:
+        return self.file_manager.show()
+
     def delete_file(self, file_to_delete:str):
         return self.file_manager.delete(file_to_delete)
 

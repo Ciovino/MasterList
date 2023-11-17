@@ -5,9 +5,11 @@ Il bot telegram per gestire diversi tipi di liste: ricettario, inventario, serie
 ### Versione 0.5 (Usiamoli un po' meglio sti file)
 Miglioramento nell'utilizzo delle liste: puoi vedere cosa hai salvato, cancellare alcune frasi, modificarne altre e basta per ora.
 #### Novità
-- _Aggiornamento comando /salva_: Ora puoi scrivere il messaggio da salvare dopo il comando.
+- _Aggiornamento comando /salva_: Ora puoi scrivere il messaggio da salvare dopo il comando;
+- _Nuovo comando /mostra_: Visualizza l'intero contenuto del file attivo.
 #### Comandi
-- _/salva \[messaggio da salvare\]_: Salva sul file attivo.
+- _/salva \[messaggio da salvare\]_: Salva sul file attivo;
+- _/mostra_: Visualizza file attivo.
 
 ### Versione 0.4 (Praticamente come nuovo)
 Nuovo codice, nuova organizzazione, anche nuovo nome.

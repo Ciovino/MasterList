@@ -8,7 +8,7 @@ class UserFileManager:
     def __init__(self, id:int, user_file:list[str]):
         self.user_id = id
         self.active_file = None
-        self.loaded_file = []
+        self.loaded_file : list[str] = []
         self.files = user_file
     
     def add_file(self, new_file_name:str) -> bool:
@@ -29,6 +29,9 @@ class UserFileManager:
     def save(self, info:str):
         self.loaded_file.append(info)
         self.save_on_file(self.active_file)
+
+    def show(self) -> list[str]:
+        return self.loaded_file
 
     def delete(self, file_to_delete:str):
         if not self.is_file(file_to_delete):

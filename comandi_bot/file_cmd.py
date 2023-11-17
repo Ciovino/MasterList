@@ -82,6 +82,28 @@ async def salva_su_file(the_bot:BotWrapper, user:UserInfo, da_salvare:str, updat
     
     user.return_to_home_state()
 
+async def mostra(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if user.get_active_file() == None:
+        user.change_state('cambia')
+        await cambia(the_bot, user, update, context)
+        return
+    
+    file_content = user.show()
+    if len(file_content) == 0:
+        messaggio_da_compilare = the_bot.return_mex("file_vuoto", user, update.message)
+    else:
+        messaggio_da_compilare = the_bot.return_mex("file_pieno", user, update.message)
+
+    for riga in file_content:
+        messaggio_da_compilare += f'\n- {riga}'
+
+    await context.bot.send_message(
+        chat_id = update.effective_chat.id,
+        text = messaggio_da_compilare
+    )
+
+    user.return_to_home_state()
+
 async def cancella(the_bot:BotWrapper, user:UserInfo, update: Update, context: ContextTypes.DEFAULT_TYPE):
     all_file = user.get_files()
     inline_keyboard = []
