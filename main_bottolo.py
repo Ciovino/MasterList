@@ -1,11 +1,11 @@
 from secret_stuff import bot_token
 from user_info import UserInfo
 from bot_wrapper import BotWrapper
+from comandi_bot import state_cmd, back_cmd, start_cmd, about_cmd, file_cmd
 
 import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from comandi_bot import state_cmd, back_cmd, start_cmd, about_cmd, file_cmd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -65,10 +65,22 @@ async def main_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if command == 'salva':
         await file_cmd.salva(list_bot, user, update, context)
+        return    
+
+    if command == 'mostra':
+        await file_cmd.mostra(list_bot, user, update, context)
         return
     
     if command == 'cancella':
         await file_cmd.cancella(list_bot, user, update, context)
+        return
+    
+    if command == 'modifica':
+        await file_cmd.modifica(list_bot, user, update, context)
+        return
+    
+    if command == 'elimina':
+        await file_cmd.elimina(list_bot, user, update, context)
         return
 
 async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -101,14 +113,59 @@ async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if state == 'salva':
-        user.save(update.message.text)
+        await file_cmd.salva_su_file(list_bot, user, update.message.text, update, context)
+        return
+    
+    if state == 'cancella':
+        try:
+            riga_da_cancellare = int(update.message.text)
+            riga_cancellata = user.delete_line(riga_da_cancellare)
+
+            if riga_cancellata < 0:
+                # La riga non è stata cancellata perchè il numero inserito era fuori dai limiti
+                messaggio = list_bot.return_mex("fuori_limite", user, update.message)
+            else:
+                messaggio = list_bot.return_mex("cancellata", user, update.message)
+                user.return_to_home_state()
+        except ValueError:
+            messaggio = list_bot.return_mex("value_error", user, update.message)
 
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, 
-            text=list_bot.return_mex("salvato", user, update.message), 
-            parse_mode='MarkdownV2'
+            chat_id = update.effective_chat.id,
+            text = messaggio
         )
-        
+        return
+    
+    if state == 'modifica':
+        try:
+            riga_da_modificare = int(update.message.text)
+
+            if riga_da_modificare <= 0 or riga_da_modificare > len(user.show()):                
+                messaggio = list_bot.return_mex("fuori_limite", user, update.message)
+            else:
+                messaggio = list_bot.return_mex("modifica_in_corso", user, update.message)
+                list_bot.modify_line(riga_da_modificare-1)
+                user.change_state('modifica_in_corso')
+        except ValueError:
+            messaggio = list_bot.return_mex("value_error", user, update.message)
+
+        await context.bot.send_message(
+            chat_id = update.effective_chat.id,
+            text = messaggio
+        )
+        return
+    
+    if state == 'modifica_in_corso':
+        if user.save_at_index(update.message.text, list_bot.get_modified_line()):
+            messaggio = list_bot.return_mex("modifica_fatta", user, update.message)
+        else:
+            messaggio = list_bot.return_mex("modifica_fallita", user, update.message)
+
+        await context.bot.send_message(
+            chat_id = update.effective_chat.id,
+            text = list_bot.return_mex("modifica_fatta", user, update.message)
+        )
+
         user.return_to_home_state()
         return
 
@@ -120,7 +177,7 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
     await query.answer()
-    await query.delete_message()
+    ## await query.delete_message()
 
     if not user.is_query_state():
         return
@@ -138,17 +195,20 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if state == 'file':
         if query.data == 'crea':
-            await file_cmd.crea(list_bot, user, update, context)
             user.change_state('crea')
+            await file_cmd.crea(list_bot, user, update, context)
+
         elif query.data == 'cambia':
-            await file_cmd.cambia(list_bot, user, update, context)
             user.change_state('cambia')
+            await file_cmd.cambia(list_bot, user, update, context)
+
         elif query.data == 'salva':
-            await file_cmd.salva(list_bot, user, update, context)
             user.change_state('salva')
-        elif query.data == 'cancella':
-            await file_cmd.cancella(list_bot, user, update, context)
-            user.change_state('cancella')
+            await file_cmd.salva(list_bot, user, update, context)
+
+        elif query.data == 'elimina':
+            user.change_state('elimina')
+            await file_cmd.elimina(list_bot, user, update, context)
 
         return
     
@@ -169,7 +229,22 @@ async def callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user.return_to_home_state()
         return
     
-    if state == 'cancella':
+    if state == 'mostra':
+        if query.data == 'back':
+            user.change_state('back')
+            await back_cmd.execute(list_bot, user, update, context)
+
+        elif query.data == 'cancella':
+            user.change_state('cancella')
+            await file_cmd.cancella(list_bot, user, update, context)
+
+        elif query.data == 'modifica':
+            user.change_state('modifica')
+            await file_cmd.modifica(list_bot, user, update, context)
+
+        return
+
+    if state == 'elimina':
         if user.delete_file(query.data):
             await context.bot.send_message(
                     chat_id=update.effective_chat.id, 
