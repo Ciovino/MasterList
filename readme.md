@@ -11,11 +11,18 @@ Miglioramento nell'utilizzo delle liste: puoi vedere cosa hai salvato, cancellar
 - _Nuovo comando /cancella_: Cancella una riga dal file attivo;
 - _Nuovo comando /modifica_: Modifica una riga dal file attivo.
 #### Comandi
-- _/salva \[messaggio da salvare\]_: Salva sul file attivo;
-- _/mostra_: Visualizza file attivo;
+- _/start_: Manda un saluto all'utente;
+- _/file_: Menù per la gestione dei file;
+- _/crea_: Crea nuovi file;
+- _/cambia_: Cambia il file attivo;
+- _/salva_: Salva sul file attivo;
+- _/mostra_: Visualizza il file attivo;
 - _/cancella_: Cancella una riga da un file;
 - _/modifica_: Modifica una riga da un file;
-- _/elimina_: Elimina un file esistente.
+- _/elimina_: Elimina un file esistente;
+- _/about_: Presentazione del bot;
+- _/state_: Visualizza lo stato del bot;
+- _/back_: Annulla l'operazione in corso.
 
 ### Versione 0.4 (Praticamente come nuovo)
 Nuovo codice, nuova organizzazione, anche nuovo nome.
